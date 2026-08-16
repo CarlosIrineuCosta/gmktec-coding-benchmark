@@ -7,7 +7,7 @@ import subprocess
 from datetime import datetime, timezone
 from pathlib import Path
 
-from .config import RESULTS, SYSTEMS
+from .config import PROFILES, RESULTS, SYSTEMS
 from .ollama_agent import ollama_json
 
 
@@ -43,7 +43,7 @@ def main():
         },
         "auth_presence": {
             "zai": configured_export(Path("/home/cdc/.config/secrets/ai.env"), "GLM_API_KEY"),
-            "kimi_profile_oauth": (Path(__file__).resolve().parent.parent / "profiles/kimi/oauth/kimi-code").exists(),
+            "kimi_profile_oauth": (PROFILES / "kimi/oauth/kimi-code").exists(),
         },
         "gmktec": {"dns": False, "ollama": False, "models": []},
     }

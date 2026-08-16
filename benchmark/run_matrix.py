@@ -10,7 +10,7 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 
-from .config import MAIN_CONTEXT, RESULTS, ROOT, SYSTEMS, TASK_IDS, TIMEOUT_SECONDS
+from .config import MAIN_CONTEXT, PROFILES, RESULTS, ROOT, SYSTEMS, TASK_IDS, TIMEOUT_SECONDS
 from .ollama_agent import run as run_ollama, unload, wait_empty
 from .prepare import packet_hash, packet_text, prepare_worktree
 from .sandbox import bwrap
@@ -58,7 +58,7 @@ def _prompt(task_id: str, context: int) -> str:
 def _native_command(system: dict, worktree: Path, prompt: str, context: int):
     harness = system["harness"]
     if harness == "codex":
-        profile = ROOT / "profiles" / "codex"
+        profile = PROFILES / "codex"
         command = [
             "codex", "exec", "--ephemeral", "--json", "--ignore-user-config",
             "-m", system["model"], "-c", 'model_reasoning_effort="high"',
@@ -68,7 +68,7 @@ def _native_command(system: dict, worktree: Path, prompt: str, context: int):
         env = _clean_env(); env["CODEX_HOME"] = "/tmp/profile"
         return bwrap(worktree, profile, command), env
     if harness == "claude":
-        profile = ROOT / "profiles" / "zai-claude"
+        profile = PROFILES / "zai-claude"
         template = profile / "settings.template.json"
         settings = profile / "settings.json"
         if not settings.exists(): shutil.copy2(template, settings)
@@ -90,7 +90,7 @@ def _native_command(system: dict, worktree: Path, prompt: str, context: int):
         env["CLAUDE_CODE_AUTO_COMPACT_WINDOW"] = str(context)
         return bwrap(worktree, profile, command), env
     if harness == "kimi":
-        profile = ROOT / "profiles" / "kimi"
+        profile = PROFILES / "kimi"
         # Prompt mode is non-interactive and inherits the profile's auto permission
         # mode. Kimi 0.31.1 rejects an explicit --auto combined with --prompt.
         command = ["/home/cdc/.kimi-code/bin/kimi", "-m", system["model"], "-p", prompt, "--output-format", "stream-json"]

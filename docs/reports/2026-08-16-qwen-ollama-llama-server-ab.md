@@ -87,4 +87,4 @@ larger coding tasks, add a template-rendering capture to the runner and use the
 same frozen task packet.
 
 Raw private records are retained on GMKtec under `/home/cdc/llm/ab/results/`
-and locally under the ignored `results/local-ab/` directory.
+and locally under the ignored `data/private/results/local-ab/` directory.

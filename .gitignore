@@ -1,12 +1,6 @@
-# Runtime evidence and private task material are never published directly.
-runs/
-results/
-hidden/
-
-# Provider profiles may contain credentials, OAuth state, identities, sessions,
-# caches, or account metadata. Commit templates only from a separate sanitized
-# location; never make exceptions inside this directory.
-profiles/
+# Generated evidence, hidden task material, and provider state are never
+# published directly. They belong under the explicit private-data boundary.
+data/private/
 
 # Common secret and runtime formats.
 .env

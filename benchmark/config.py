@@ -1,8 +1,13 @@
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-RUNS = ROOT / "runs"
-RESULTS = ROOT / "results"
+# Generated evidence and provider state are deliberately separate from source
+# and readable project documentation.  Nothing below DATA_PRIVATE is tracked.
+DATA_PRIVATE = ROOT / "data" / "private"
+RUNS = DATA_PRIVATE / "runs"
+RESULTS = DATA_PRIVATE / "results"
+HIDDEN = DATA_PRIVATE / "hidden"
+PROFILES = DATA_PRIVATE / "profiles"
 TASKS = ROOT / "tasks"
 TIMEOUT_SECONDS = 30 * 60
 MAIN_CONTEXT = 65_536

@@ -9,7 +9,7 @@ import tempfile
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
-from .config import RESULTS, ROOT
+from .config import HIDDEN, RESULTS, RUNS
 
 
 def _timing_contaminated(run_id: str) -> bool:
@@ -39,16 +39,16 @@ def _ratio(result):
 
 def score_run(result_file: Path):
     record = json.loads(result_file.read_text())
-    worktree = ROOT / "runs" / record["run_id"] / "worktree"
+    worktree = RUNS / record["run_id"] / "worktree"
     task = record["task"]
     baseline = _pytest(worktree)
     with tempfile.TemporaryDirectory(prefix="coding-benchmark-score-") as temp:
         repo = Path(temp) / "repo"; shutil.copytree(worktree, repo, ignore=shutil.ignore_patterns(".git"))
-        acceptance = ROOT / "hidden" / task / "acceptance"
+        acceptance = HIDDEN / task / "acceptance"
         acceptance_targets: list[Path] = []
         if acceptance.exists():
             shutil.copytree(acceptance, repo, dirs_exist_ok=True)
-            node_manifest = ROOT / "hidden" / task / "acceptance_nodes.txt"
+            node_manifest = HIDDEN / task / "acceptance_nodes.txt"
             if node_manifest.exists():
                 acceptance_targets = [
                     str(repo / node.split("::", 1)[0]) + "::" + node.split("::", 1)[1]

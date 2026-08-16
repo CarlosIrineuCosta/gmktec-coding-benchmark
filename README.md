@@ -18,5 +18,7 @@ python3 -m benchmark.run_matrix --context 65536
 python3 -m benchmark.score
 ```
 
-Results and run worktrees are gitignored. A timeout is terminal and is never
+Readable project material belongs under [`docs/`](docs/README.md). Generated
+evidence, candidate worktrees, hidden tests, and provider profiles belong under
+the gitignored `data/private/` boundary. A timeout is terminal and is never
 retried. Use `--dry-run` to print the 27-run matrix without invoking a model.

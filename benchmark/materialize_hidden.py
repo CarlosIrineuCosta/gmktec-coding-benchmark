@@ -6,7 +6,7 @@ import subprocess
 import tarfile
 from pathlib import Path
 
-from .config import ROOT
+from .config import HIDDEN
 from .prepare import DAILY, DAILY_COMMIT, FLOOR, HISTORICAL_COMMIT
 
 REFERENCE_FLOOR = "a122054aacad90a48d59532a56a0451739e322ad"
@@ -21,7 +21,7 @@ def _git_files(repo: Path, commit: str, files: list[str], out: Path):
 
 
 def main():
-    hidden = ROOT / "hidden"
+    hidden = HIDDEN
     if hidden.exists(): shutil.rmtree(hidden)
     # Historical public regression suite from the pre-fix snapshot and hidden
     # acceptance tests from the post-fix reference commit.
