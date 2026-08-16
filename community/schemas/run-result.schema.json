@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/gmktec-benchmark/run-result.schema.json",
+  "title": "Local coding model run result",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "schema_version",
+    "run_id",
+    "started_at",
+    "backend",
+    "model",
+    "task",
+    "context",
+    "outcome"
+  ],
+  "properties": {
+    "schema_version": { "const": "0.1.0" },
+    "run_id": { "type": "string", "minLength": 1 },
+    "started_at": { "type": "string", "format": "date-time" },
+    "finished_at": { "type": "string", "format": "date-time" },
+    "hardware": {
+      "type": "object",
+      "required": ["system", "memory_bytes"],
+      "properties": {
+        "system": { "type": "string" },
+        "memory_bytes": { "type": "integer", "minimum": 1 },
+        "gpu": { "type": "string" },
+        "power_mode": { "type": "string" }
+      }
+    },
+    "backend": {
+      "type": "object",
+      "required": ["name", "version"],
+      "properties": {
+        "name": { "type": "string" },
+        "version": { "type": "string" },
+        "commit": { "type": ["string", "null"] },
+        "command_redacted": { "type": ["string", "null"] }
+      }
+    },
+    "model": {
+      "type": "object",
+      "required": ["identifier", "digest", "quantization"],
+      "properties": {
+        "identifier": { "type": "string" },
+        "digest": { "type": "string" },
+        "quantization": { "type": "string" },
+        "chat_template_digest": { "type": ["string", "null"] }
+      }
+    },
+    "task": {
+      "type": "object",
+      "required": ["packet_sha256", "tool_schema_sha256"],
+      "properties": {
+        "packet_sha256": { "type": "string" },
+        "tool_schema_sha256": { "type": "string" },
+        "public_task_id": { "type": ["string", "null"] }
+      }
+    },
+    "context": {
+      "type": "object",
+      "required": ["requested_tokens"],
+      "properties": {
+        "requested_tokens": { "type": "integer", "minimum": 1 },
+        "effective_tokens": { "type": ["integer", "null"], "minimum": 1 },
+        "effective_context_evidence": { "type": ["string", "null"] }
+      }
+    },
+    "sampling": {
+      "type": "object",
+      "properties": {
+        "temperature": { "type": ["number", "null"] },
+        "max_output_tokens": { "type": ["integer", "null"], "minimum": 1 }
+      }
+    },
+    "tool_calls": {
+      "type": "object",
+      "properties": {
+        "total": { "type": "integer", "minimum": 0 },
+        "unique": { "type": "integer", "minimum": 0 },
+        "duplicate": { "type": "integer", "minimum": 0 },
+        "invalid": { "type": "integer", "minimum": 0 },
+        "rejected": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "timings": {
+      "type": "object",
+      "properties": {
+        "wall_seconds": { "type": "number", "minimum": 0 },
+        "prompt_tokens": { "type": ["integer", "null"], "minimum": 0 },
+        "generation_tokens": { "type": ["integer", "null"], "minimum": 0 },
+        "prompt_tokens_per_second": { "type": ["number", "null"], "minimum": 0 },
+        "generation_tokens_per_second": { "type": ["number", "null"], "minimum": 0 }
+      }
+    },
+    "outcome": {
+      "type": "object",
+      "required": ["status", "stop_reason"],
+      "properties": {
+        "status": {
+          "enum": ["completed", "timeout", "serving_failure", "harness_failure"]
+        },
+        "stop_reason": { "type": "string" },
+        "tests_passed": { "type": ["integer", "null"], "minimum": 0 },
+        "tests_failed": { "type": ["integer", "null"], "minimum": 0 },
+        "timing_contaminated": { "type": "boolean" }
+      }
+    }
+  }
+}

@@ -1,0 +1,27 @@
+# Runtime evidence and private task material are never published directly.
+runs/
+results/
+hidden/
+
+# Provider profiles may contain credentials, OAuth state, identities, sessions,
+# caches, or account metadata. Commit templates only from a separate sanitized
+# location; never make exceptions inside this directory.
+profiles/
+
+# Common secret and runtime formats.
+.env
+.env.*
+*.log
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+
+# Python and test caches.
+*.pyc
+__pycache__/
+.pytest_cache/
+
+# Build products.
+build/
+dist/
+*.egg-info/
