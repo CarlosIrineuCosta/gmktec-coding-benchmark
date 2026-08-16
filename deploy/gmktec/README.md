@@ -59,6 +59,14 @@ file. The server must use the exact GGUF and explicit template selected for the
 corresponding canary. Do not enable a fallback model, automatic retries, native
 web tools, or project-local extensions during qualification.
 
+The qualification template intentionally uses Qwen Code's `tools.core`
+allowlist. It limits the ordinary core file/shell tools, while `permissions.deny`
+only rejects invocation after a tool remains registered. In Qwen Code 0.21.12,
+some platform-level tools still appeared despite this allowlist; treat that as a
+recorded harness limitation, not as a complete registration barrier. Use
+`--approval-mode plan` for a preflight and `--approval-mode auto-edit` only for
+an explicitly admitted edit/test turn.
+
 ## Restricted local-harness account
 
 `create-llm-runner-user.sh` creates the GMKtec `llm-runner` account for local

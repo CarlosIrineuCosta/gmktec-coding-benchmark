@@ -2,6 +2,18 @@
   "general": {
     "enableAutoUpdate": false
   },
+  "tools": {
+    "core": [
+      "list_directory",
+      "read_file",
+      "glob",
+      "grep_search",
+      "write_file",
+      "edit",
+      "run_shell_command"
+    ],
+    "approvalMode": "default"
+  },
   "security": {
     "auth": {
       "selectedType": "openai",
