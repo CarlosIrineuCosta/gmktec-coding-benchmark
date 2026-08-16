@@ -45,4 +45,6 @@ host resource samples, then stop the process before the next condition.
 
 The same Qwen blob, temperature, generation cap, tool schema, prompt, and
 strict one-tool-call executor must be used with Ollama. A multiple or malformed
-tool call is a recorded contract failure, not a retry.
+tool call is a recorded contract failure, not a retry. Once the supplied test
+returns success, the executor withdraws the tool schema and requires one final
+no-tool completion; it never keeps offering a tool after completion is known.

@@ -88,6 +88,11 @@ def json_request(url: str, body: dict[str, Any], timeout: int = 900) -> dict[str
         return json.loads(response.read().decode())
 
 
+def json_get(url: str, timeout: int = 30) -> dict[str, Any]:
+    with urllib.request.urlopen(urllib.request.Request(url), timeout=timeout) as response:
+        return json.loads(response.read().decode())
+
+
 def stream_chat(base_url: str, payload: dict[str, Any], timeout: int = 900) -> tuple[dict[str, Any], dict[str, Any]]:
     """Return reconstructed assistant message and unparsed SSE evidence."""
     payload = {**payload, "stream": True}
@@ -261,9 +266,19 @@ def wait_health(base_url: str, timeout: int = 600) -> None:
 
 def props(base_url: str) -> dict[str, Any] | None:
     try:
-        request = urllib.request.Request(base_url + "/props")
+        request = urllib.request.Request(base_url.removesuffix("/v1") + "/props")
         with urllib.request.urlopen(request, timeout=10) as response:
             return json.loads(response.read().decode())
+    except Exception:
+        return None
+
+
+def effective_context(backend: "Backend") -> dict[str, Any] | None:
+    if backend.name == "llama-server":
+        return props(backend.base_url)
+    try:
+        payload = json_get(OLLAMA_API + "/api/ps", timeout=10)
+        return next((row for row in payload.get("models") or [] if row.get("name") == MODEL), None)
     except Exception:
         return None
 
@@ -339,6 +354,7 @@ def run_once(backend: Backend, root: Path, context: int, repetition: int) -> dic
     started = time.monotonic()
     pids = server_pids("ollama serve") if backend.name == "ollama" else ([backend.launch.pid] if backend.launch else [])
     stop_reason = "max_steps"
+    test_passed_in_loop = False
     with Monitor(pids) as monitor:
         try:
             readiness, evidence = stream_chat(backend.base_url, request_base | {"messages": messages})
@@ -346,9 +362,18 @@ def run_once(backend: Backend, root: Path, context: int, repetition: int) -> dic
             messages.append(readiness)
             messages.append({"role": "user", "content": EXECUTE})
             for step in range(10):
-                reply, evidence = stream_chat(backend.base_url, request_base | {"messages": messages, "tools": [TOOL]})
+                request_payload = request_base | {"messages": messages}
+                if not test_passed_in_loop:
+                    request_payload["tools"] = [TOOL]
+                reply, evidence = stream_chat(backend.base_url, request_payload)
                 transcript.append({"phase": "execution", "step": step + 1, "message": reply, "transport": evidence})
                 calls = reply.get("tool_calls") or []
+                if test_passed_in_loop:
+                    if calls:
+                        stop_reason = "tool_call_after_tools_removed"
+                    else:
+                        stop_reason = evidence.get("finish_reason") or "final_after_passing_test"
+                    break
                 if not calls:
                     stop_reason = evidence.get("finish_reason") or "no_tool_call"
                     break
@@ -371,6 +396,8 @@ def run_once(backend: Backend, root: Path, context: int, repetition: int) -> dic
                     break
                 messages.append(reply)
                 messages.append({"role": "tool", "tool_call_id": call.get("id") or "call_0", "content": output})
+                if arguments.get("action") == "run_test" and output.startswith("exit=0\n"):
+                    test_passed_in_loop = True
             test = final_test(root)
         except (urllib.error.URLError, TimeoutError, RuntimeError, ValueError) as exc:
             stop_reason = f"transport_or_harness_error:{type(exc).__name__}"
@@ -388,6 +415,8 @@ def run_once(backend: Backend, root: Path, context: int, repetition: int) -> dic
             "base_url": backend.base_url,
             "load_seconds": backend.load_seconds,
             "llama_cpp_commit": "4df29be4f4c3673f428170fda944a5b19f743bb8" if backend.name == "llama-server" else None,
+            "server_command": [str(LLAMA_LAUNCH), "LLAMA_CTX_SIZE=<context>"] if backend.name == "llama-server" else None,
+            "ollama_options": {"num_ctx": context, "num_predict": 1024, "temperature": 0} if backend.name == "ollama" else None,
         },
         "model": {
             "identifier": MODEL,
@@ -395,7 +424,7 @@ def run_once(backend: Backend, root: Path, context: int, repetition: int) -> dic
             "digest": QWEN_BLOB.name.removeprefix("sha256-"),
             "byte_size": QWEN_BLOB.stat().st_size,
         },
-        "context": {"requested_tokens": context, "props": props(backend.base_url)},
+        "context": {"requested_tokens": context, "effective_context_evidence": effective_context(backend)},
         "sampling": {"temperature": 0, "max_tokens": 1024, "stream": True, "parallel_tool_calls": False},
         "contract": {"single_tool_function": TOOL, "raw_output_retained": True},
         "outcome": {"stop_reason": stop_reason, "test": test, "module": module, "wall_seconds": time.monotonic() - started},
