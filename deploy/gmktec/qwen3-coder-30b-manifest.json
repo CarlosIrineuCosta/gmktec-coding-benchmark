@@ -1,0 +1,16 @@
+{
+  "model_id": "qwen3-coder:30b",
+  "gguf_path": "/usr/share/ollama/.ollama/models/blobs/sha256-1194192cf2a187eb02722edcc3f77b11d21f537048ce04b67ccf8ba78863006a",
+  "gguf_sha256": "1194192cf2a187eb02722edcc3f77b11d21f537048ce04b67ccf8ba78863006a",
+  "byte_size": 18556688736,
+  "ollama_renderer": "qwen3-coder",
+  "ollama_parser": "qwen3-coder",
+  "llama_cpp_commit": "4df29be4f4c3673f428170fda944a5b19f743bb8",
+  "llama_cpp_build": 10454,
+  "transport": {
+    "host": "127.0.0.1",
+    "port": 8081,
+    "metrics": true,
+    "builtin_tools_enabled": false
+  }
+}
