@@ -32,6 +32,12 @@ Ollama:       http://127.0.0.1:11434/v1
 llama-server: http://127.0.0.1:8081/v1
 ```
 
+The host must have an isolated Python environment containing `pytest`; the
+canary never assumes that a system Python package happens to be installed. On
+Ubuntu 24.04, provision `python3.12-venv` once, then create
+`/home/cdc/llm/ab/venv` and install `pytest` there. The runner is invoked with
+`CANARY_PYTHON=/home/cdc/llm/ab/venv/bin/python`.
+
 For each context in 8192, 16384, and 32768 (advance only after three successful
 prior runs), start `llama-qwen3-coder-30b.sh` with `LLAMA_CTX_SIZE` set to that
 value, run the three repetitions, collect `/health`, `/props`, `/metrics`, and
