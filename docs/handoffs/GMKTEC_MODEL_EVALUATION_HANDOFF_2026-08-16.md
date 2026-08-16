@@ -6,6 +6,18 @@
 
 **Status:** diagnostic handoff, not a final model ranking
 
+## Later controlled Qwen qualification
+
+After this handoff was drafted, Qwen3-Coder 30B was qualified through
+loopback-only llama-server at an independently observed 64K context using a
+restricted `llm-runner` Unix account. A minimal single-tool harness passed
+three fully specified disposable two-file correction canaries, with exact
+`READY` preflight responses and four allowed actions per task. A matched Qwen
+Code 0.21.12 plan-mode preflight did not honour the no-tool gate: it registered
+a broad platform tool surface and continued with file/shell actions after
+emitting `READY`. This is a Qwen Code contract block, not a model-quality
+failure. See `docs/reports/2026-08-16-minimal-harness-vs-qwen-code.md`.
+
 ## Executive summary
 
 Nine coding systems were asked to perform three tasks in isolated worktrees at a
