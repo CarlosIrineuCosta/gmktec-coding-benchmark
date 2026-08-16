@@ -1,0 +1,33 @@
+{
+  "general": {
+    "enableAutoUpdate": false
+  },
+  "security": {
+    "auth": {
+      "selectedType": "openai",
+      "enforcedType": "openai"
+    }
+  },
+  "model": {
+    "name": "qwen3-coder:30b"
+  },
+  "modelProviders": {
+    "openai": [
+      {
+        "id": "qwen3-coder:30b",
+        "name": "Qwen3-Coder 30B via local llama-server",
+        "envKey": "QWEN_LOCAL_API_KEY",
+        "baseUrl": "http://127.0.0.1:8081/v1",
+        "generationConfig": {
+          "timeout": 900000,
+          "maxRetries": 0,
+          "contextWindowSize": 65536,
+          "samplingParams": {
+            "temperature": 0,
+            "max_tokens": 1024
+          }
+        }
+      }
+    ]
+  }
+}

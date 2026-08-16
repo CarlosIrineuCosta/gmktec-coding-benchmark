@@ -48,3 +48,28 @@ strict one-tool-call executor must be used with Ollama. A multiple or malformed
 tool call is a recorded contract failure, not a retry. Once the supplied test
 returns success, the executor withdraws the tool schema and requires one final
 no-tool completion; it never keeps offering a tool after completion is known.
+
+## Qwen Code qualification profile
+
+`qwen-code-qwen3-coder-30b-settings.json` is a non-secret, isolated profile
+template for qualifying Qwen Code against the loopback-only Qwen llama-server.
+It is a harness comparison, not a Floor deployment. Use a separate `QWEN_HOME`
+and `QWEN_RUNTIME_DIR`; keep the API-key placeholder in a local ignored `.env`
+file. The server must use the exact GGUF and explicit template selected for the
+corresponding canary. Do not enable a fallback model, automatic retries, native
+web tools, or project-local extensions during qualification.
+
+## Restricted local-harness account
+
+`create-llm-runner-user.sh` creates the GMKtec `llm-runner` account for local
+coding harnesses. It has a locked password, no supplemental privilege groups,
+and a private `/srv/llm-runner` home for disposable worktrees, tool profiles,
+and transcripts. It authorizes the existing GMKtec automation public key so the
+harness can be operated without making `cdc`'s home readable.
+
+This is a Unix-account boundary, not a container: it does not by itself remove
+network egress or restrict world-readable system files. It is the immediate
+fallback when mount-namespace sandboxing is unavailable. The runner must use
+fresh clones under `/srv/llm-runner/workspaces`; access to a canonical checkout
+is granted only later, per admitted task, through a narrow ACL or reviewed
+promotion path.
