@@ -18,6 +18,14 @@ a broad platform tool surface and continued with file/shell actions after
 emitting `READY`. This is a Qwen Code contract block, not a model-quality
 failure. See `docs/reports/2026-08-16-minimal-harness-vs-qwen-code.md`.
 
+OpenCode `1.18.18` was then installed only for the restricted `llm-runner`
+user. With ordinary workspace read/edit/shell tools but external-directory,
+web, subagent, and skill access denied, it completed the same correction in
+17.782 seconds. The exact-path permission profile was incompatible with this
+local adapter's relative-path representation; the practical profile relies on
+the Unix-user boundary for containment. See
+`docs/reports/2026-08-16-opencode-qwen3-coder-qualification.md`.
+
 ## Executive summary
 
 Nine coding systems were asked to perform three tasks in isolated worktrees at a
