@@ -32,11 +32,14 @@ Ollama:       http://127.0.0.1:11434/v1
 llama-server: http://127.0.0.1:8081/v1
 ```
 
-The host must have an isolated Python environment containing `pytest`; the
-canary never assumes that a system Python package happens to be installed. On
-Ubuntu 24.04, provision `python3.12-venv` once, then create
-`/home/cdc/llm/ab/venv` and install `pytest` there. The runner is invoked with
-`CANARY_PYTHON=/home/cdc/llm/ab/venv/bin/python`.
+The actual execution identity must have an isolated Python environment
+containing `pytest`; the canary never assumes that a system Python package
+happens to be installed.  For local coding harnesses this is the restricted
+`llm-runner` account, not `cdc`: create `/srv/llm-runner/venv` with
+`bootstrap-llm-runner-pytest.sh` and pass
+`BENCHMARK_PYTHON=/srv/llm-runner/venv/bin/python`.  Before every task run,
+`verify-python-test-env.sh` must compile and run the common smoke suite as that
+same account.  See the harness readiness contract in `docs/architecture/`.
 
 For each context in 8192, 16384, and 32768 (advance only after three successful
 prior runs), start `llama-qwen3-coder-30b.sh` with `LLAMA_CTX_SIZE` set to that
