@@ -27,6 +27,81 @@ Current route posture:
 
 Raw runner evidence is retained under the restricted experiment root `/srv/llm-runner/experiments/unsloth-qwen38-27b-20260818`. This report intentionally contains no API keys or raw server logs.
 
+## Reproducibility appendix: actual invocations, request contracts, and prompts
+
+This appendix records what was actually invoked. It is **not** an assertion that these were the optimal Unsloth settings; the subsequent review correctly challenged that premise. No secret value, token, cookie, or credential path is included.
+
+### Exact model files and Unsloth launch contract
+
+The local models were loaded sequentially, one process at a time:
+
+- `Qwen3.8-27B-Q8_0.gguf`
+- `Qwen3.8-27B-UD-Q6_K_XL.gguf`
+- `Qwen3.8-27B-UD-Q5_K_XL.gguf`
+
+For each file, the recorded CLI invocation was the following, replacing only `<MODEL>`:
+
+```bash
+unsloth run --model "<MODEL>" --max-seq-length 65536 --gpu-memory-mode manual \
+  --host 127.0.0.1 --port 18888 --api-only --parallel 1 --disable-tools \
+  --no-cloudflare --temperature 0.2 --top-p 0.95
+```
+
+Thus the effective local test launch was 64K maximum sequence length, manual GPU-memory mode, single request parallelism, and no server-native tools. The server exposed an OpenAI-compatible local endpoint; benchmark requests used `model: "local"`. The native template and MTP artifact were resolved by the Unsloth backend; the recorded MTP ceiling was two draft tokens. No Q4 file was launched.
+
+Request-level generation settings were explicit and identical across local quants:
+
+| Contract | Temperature | Top-p | Max output | Tools/reasoning |
+| --- | ---: | ---: | ---: | --- |
+| Restricted and fresh-agent canaries | 0.2 | 0.95 | 4096 | Harness-only `read_file`, `write_file`, `run_tests`; `enable_tools=false`, `reasoning_effort=none` |
+| Volcano and raycaster one-shots | 0.2 | 0.95 | 6000 | No tools; `enable_tools=false`, `reasoning_effort=none` |
+
+### Non-secret prompt packet
+
+The following are the exact scoring prompts. The restricted canary first materialized `module.py` and `test_canary.py` in a fresh worktree.
+
+```text
+Inspect module.py and test_canary.py. Make normalize_tag strip surrounding whitespace and lowercase its input. Use only supplied tools and run tests before finishing.
+```
+
+```text
+Inspect this unfamiliar repository and fix the requested bounded change. The task is documented in PACKET.md supplied in the worktree root. Use only read_file, write_file, and run_tests. First inspect relevant files, then implement the smallest correct patch, run tests, diagnose and repair if necessary. Do not stop until tests pass; finish with a concise summary.
+```
+
+```text
+In HTML, create a transparent volcanic mountain showing underground magma chambers. The simulation starts as pressure builds beneath the volcano until an eruption occurs. Include magma pressure increasing based on depth and trapped gas expansion; rock layers cracking and deforming before eruption; downhill lava with temperature-dependent viscosity; buoyant ash with atmospheric drag; projectile rocks; cooling lava; steam explosions when lava contacts underground water; trees and structures reacting to heat radiation and shock waves; different lava compositions with different flow speeds; and controls for magma temperature and gas pressure. Return only one self-contained index.html. Use no external libraries, assets, or network requests.
+```
+
+```text
+Create one self-contained index.html implementing a playable browser first-person raycaster inspired by early DOOM. It must use a real raycaster, not fake 3D boxes. Include a sector map with varied floor and ceiling heights; textured walls, floors and ceilings generated in code; working stair height transitions; curved walls approximated by line segments; sector lighting with distance falloff; a vertical opening door; WASD movement, mouse look and collision. Return only complete HTML with no external libraries, assets, or network requests.
+```
+
+The equal second-pass volcano repair prompt was:
+
+```text
+You are revising a browser simulation after independent functional validation.
+
+The page loads and its visual layout is acceptable, but validation established:
+- controls receive clicks;
+- no JavaScript exception occurs (apart from an irrelevant missing favicon);
+- time, pressure, particles, and telemetry remain frozen at their initial values;
+- the source defines physics/update functions but never starts an animation/update/render loop.
+
+Return one complete, self-contained replacement `volcano.html` only. Preserve and improve the existing visual concept, but make it genuinely runnable: initialize after layout, start a requestAnimationFrame loop, calculate stable delta time, invoke update and render every frame, wire every visible control, and keep reset/pause/eruption behaviors working. No external assets, libraries, server calls, or Markdown fences.
+```
+
+GLM-5.3 and K3 received the same semantic scoring packet through their native file-editing clients, with the output target made explicit (`browser/volcano.html` or `browser/doom_raycaster.html`): "Use the file-editing tools to write exactly one self-contained HTML file at [target]." The agentic prompt was exactly: `Read PACKET.md, inspect this unfamiliar repository, implement the requested bounded change, run the supplied tests, diagnose and repair if needed. Keep the patch minimal and do not modify test files.`
+
+### External-route configuration and elapsed-time evidence
+
+| Route | Non-secret configuration | Completion / failure timing actually captured |
+| --- | --- | --- |
+| Terra High | Native Codex harness, high reasoning effort | Fresh task: about 40s interactive wall interval; 34,793 reported tokens; acceptance pass. |
+| GLM-5.3 | Authenticated Z.ai Anthropic-compatible endpoint, `claude --print --model glm-5.3`; fresh-agent retry used a fixture-only allowlist | Final agentic invocation: about 206s controller wall, acceptance pass on independent 3-test rerun; its own pytest tool calls remained approval-gated. Volcano artifact was written, then client remained non-terminal for 46m 38s before controlled termination; raycaster reached the 600s bound without an artifact. |
+| Kimi K3 | Disposable copied profile, `KIMI_CODE_HOME=/tmp/kimi-k3-executor-profile`, `kimi -m kimi-code/k3-256k` | Fresh agentic task: about 48s controller wall, 3-test acceptance pass. Volcano and raycaster calls each reached their 600s bound; volcano file existed and functioned, raycaster file did not exist. |
+
+The GLM/K3 three-run restricted canaries were direct 3/3 acceptance passes, but per-run elapsed values were not persisted by that late corrective harness. They are therefore intentionally not reconstructed from terminal polling intervals.
+
 ## Core run
 
 Each quant ran the same fixed-sampling core suite at 64K: three repetitions of the restricted Python canary, two browser one-shots, and an isolated agentic coding canary. Total suite wall time was strikingly close despite the smaller quant:
