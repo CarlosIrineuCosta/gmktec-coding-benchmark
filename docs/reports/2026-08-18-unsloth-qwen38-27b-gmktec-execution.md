@@ -1,14 +1,14 @@
 # GMKtec Unsloth Qwen3.8-27B Execution Record
 
 **Date:** 2026-08-18
-**Status:** executed; evidence frozen; no Q4 variant tested
+**Status:** executed; corrected route evidence added 2026-08-18; no Q4 variant tested
 **Scope:** Unsloth Studio/CLI serving of Qwen3.8-27B Q8_0, UD-Q6_K_XL, and UD-Q5_K_XL on GMKtec. This is a controlled experiment, not a production promotion.
 
 ## Decision answer
 
 Qwen3.8-27B cannot yet become the default practical local coding model for autonomous repository work on this machine. The strongest practical quant in this run is **UD-Q5_K_XL**, because it alone made the second-pass browser simulation operational and it completed the 128K retrieval contract. That is useful evidence for local exploratory generation and bounded two-pass browser work.
 
-It is not sufficient evidence for local-first autonomous coding: the selected Q5 route exhausted its fresh agentic substitution task without editing the fixture, and direct independent validation failed both acceptance tests. The properly executed Terra comparison made the minimal correct patch and passed both tests.
+It is not sufficient evidence for local-first autonomous coding: the selected Q5 route exhausted its fresh agentic substitution task without editing the fixture, and direct independent validation failed both acceptance tests. The properly executed Terra and GLM-5.3 comparisons each made a test-valid patch and passed both supplied tests.
 
 Current route posture:
 
@@ -67,13 +67,13 @@ The same independent `PolicyStore.rename_rule` task was materialized in four iso
 
 - **Local Q5:** the local tool-agent run terminated at its turn cap after 30.902 seconds, with 16 turns, 16 tool calls, and zero writes. It reported an apparent visible test success, but that test had the same worktree/path defect. Independent direct validation from the fixture (`PYTHONPATH=. python3 -m pytest -q`) failed both tests and confirmed no patch. This is a valid local failure, with a harness false-positive explicitly separated from the result.
 - **Terra:** made the minimal `pop`/collision-check patch and passed the two tests both during the agent run and under an independent direct rerun. It consumed 34,793 reported tokens. The interactive wall interval was about 40 seconds.
-- **GLM-5.3:** no score. The installed Claude runner reported that `glm-5.3` was unavailable or inaccessible.
-- **Kimi K3:** no score. The installed Kimi CLI reported that `kimi-k3` was not configured in its `config.toml`; the prior background invocation was therefore a launcher/configuration failure, not model behavior.
+- **GLM-5.3:** the first invocation was invalid because it used a generic Claude process without the Floor-managed Z.ai route. The corrected invocation used the managed Z.ai Anthropic-compatible endpoint and the `.claude-glm` profile. Live `c-translator` and `c-daily-ops` currently export `glm-5.2` as their controller default, but the same authenticated endpoint accepted `glm-5.3`. GLM-5.3 made a minimal patch and passed the two supplied tests under both its own run and independent direct validation. Its patch rejects a normalized same-name rename as a collision; that behavior is not covered by the task's acceptance tests and is less permissive than Terra's no-op handling.
+- **Kimi K3:** the first invocation used the default Kimi home, whose model registry does not include `kimi-k3`. The managed `floor-design-adv` profile declares `kimi-code/k3-256k`; a non-mutating health prompt completed successfully on that route. That profile intentionally disables Bash and general writes and limits output writes to its advisor root. It is therefore an available, authenticated advisor route, but not an autonomous coding-agent route, and has no substitution-task score.
 
-This comparison is deliberately incomplete rather than artificially ranked. It supplies one valid remote result (Terra) and one valid local failure (Q5); it does not supply comparable GLM, Kimi, or cost data.
+This comparison is deliberately incomplete rather than artificially ranked. It supplies two valid remote task results (Terra and GLM-5.3), one valid local failure (Q5), and a verified-but-advisor-only Kimi route. It does not supply a Kimi coding-agent score or comparable provider cost data.
 
 ## Important limitations and next controlled action
 
-The Q5 browser repair and 111K retrieval success justify retaining the route for further controlled work. They do not override the fresh agentic failure. Before considering a default-local coding promotion, rerun the fresh repository task with the test-execution path fixed in the agent harness and require repeated direct acceptance passes. Then restore configured, authenticated GLM and Kimi routes before attempting a cost/quality substitution comparison.
+The Q5 browser repair and 111K retrieval success justify retaining the route for further controlled work. They do not override the fresh agentic failure. Before considering a default-local coding promotion, rerun the fresh repository task with the test-execution path fixed in the agent harness and require repeated direct acceptance passes. Any future Kimi coding comparison needs a separately authorized executor profile; the existing managed Kimi profiles must remain advisor-only.
 
 No active Floor code, policy, launcher, or runtime behavior was modified by this experiment. All model work occurred in disposable fixtures or the isolated GMKtec experiment root.
