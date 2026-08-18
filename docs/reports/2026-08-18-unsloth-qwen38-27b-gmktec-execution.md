@@ -1,7 +1,7 @@
 # GMKtec Unsloth Qwen3.8-27B Execution Record
 
 **Date:** 2026-08-18
-**Status:** executed; corrected route evidence added 2026-08-18; no Q4 variant tested
+**Status:** executed; corrected GLM-5.3 and Kimi K3 full-core rerun added 2026-08-18; no Q4 variant tested
 **Scope:** Unsloth Studio/CLI serving of Qwen3.8-27B Q8_0, UD-Q6_K_XL, and UD-Q5_K_XL on GMKtec. This is a controlled experiment, not a production promotion.
 
 ## Decision answer
@@ -68,12 +68,27 @@ The same independent `PolicyStore.rename_rule` task was materialized in four iso
 - **Local Q5:** the local tool-agent run terminated at its turn cap after 30.902 seconds, with 16 turns, 16 tool calls, and zero writes. It reported an apparent visible test success, but that test had the same worktree/path defect. Independent direct validation from the fixture (`PYTHONPATH=. python3 -m pytest -q`) failed both tests and confirmed no patch. This is a valid local failure, with a harness false-positive explicitly separated from the result.
 - **Terra:** made the minimal `pop`/collision-check patch and passed the two tests both during the agent run and under an independent direct rerun. It consumed 34,793 reported tokens. The interactive wall interval was about 40 seconds.
 - **GLM-5.3:** the first invocation was invalid because it used a generic Claude process without the Floor-managed Z.ai route. The corrected invocation used the managed Z.ai Anthropic-compatible endpoint and the `.claude-glm` profile. Live `c-translator` and `c-daily-ops` currently export `glm-5.2` as their controller default, but the same authenticated endpoint accepted `glm-5.3`. GLM-5.3 made a minimal patch and passed the two supplied tests under both its own run and independent direct validation. Its patch rejects a normalized same-name rename as a collision; that behavior is not covered by the task's acceptance tests and is less permissive than Terra's no-op handling.
-- **Kimi K3:** the first invocation used the default Kimi home, whose model registry does not include `kimi-k3`. The managed `floor-design-adv` profile declares `kimi-code/k3-256k`; a non-mutating health prompt completed successfully on that route. That profile intentionally disables Bash and general writes and limits output writes to its advisor root. It is therefore an available, authenticated advisor route, but not an autonomous coding-agent route, and has no substitution-task score.
+- **Kimi K3:** the first invocation used the default Kimi home, whose model registry does not include `kimi-k3`. The managed `floor-design-adv` profile declares `kimi-code/k3-256k`; a non-mutating health prompt completed successfully on that route. The initial result was therefore invalid as a coding-agent score; the corrected executor-profile rerun is recorded below.
 
-This comparison is deliberately incomplete rather than artificially ranked. It supplies two valid remote task results (Terra and GLM-5.3), one valid local failure (Q5), and a verified-but-advisor-only Kimi route. It does not supply a Kimi coding-agent score or comparable provider cost data.
+This comparison is deliberately incomplete rather than artificially ranked. It supplies two valid remote task results (Terra and GLM-5.3), one valid local failure (Q5), and the corrected Kimi executor result below. It does not supply comparable provider cost data.
+
+## Corrected GLM-5.3 and Kimi K3 full-core rerun
+
+The prior generic-provider calls were invalid and have been superseded by this direct, bounded rerun. GLM-5.3 used the authenticated Z.ai Anthropic-compatible route with a fixture-only tool allowlist. K3 used a disposable copy of the managed K3 profile at `/tmp/kimi-k3-executor-profile`; the original managed profile was not modified. Both ran only against fresh isolated fixtures.
+
+| Contract | GLM-5.3 | Kimi K3 (`kimi-code/k3-256k`) |
+| --- | --- | --- |
+| Restricted Python canary (3 independent runs) | 3/3 direct passes | 3/3 direct passes |
+| Fresh `TagIndex.rename` agentic task | Minimal patch created; independent visible+hidden acceptance: 3/3 passed. The model's own pytest calls remained approval-gated. | Minimal patch created, supplied test run completed, and independent visible+hidden acceptance: 3/3 passed. |
+| Volcano one-shot | 55.8 KB HTML artifact; live browser telemetry advances and controls change state. | 30.1 KB HTML artifact; live browser telemetry advances; trigger-eruption control reached cooling/refilling state. |
+| DOOM/raycaster one-shot | No artifact. The direct call reached its ten-minute bound. | No artifact. The direct call reached its ten-minute bound. |
+
+Browser validation found no application exception in either volcano page. The sole console error in each case was a missing local `favicon.ico` (HTTP 404). GLM advanced from 92 to 94 MPa and 1 to 6 cm uplift during a three-second observation; later validation observed fracturing, dike ascent, phreatic-burst, wildfire, and controls changing the active composition/rate. K3 advanced from 28.7 to 31.7 MPa in the same observation window; its trigger-eruption control subsequently drove pressure down to 27.8 MPa, magma remaining to 16%, and rock integrity to 19% in the cooling/refilling state.
+
+The two generated volcanoes are intentionally left available for human inspection at `http://100.106.201.33:19011/volcano.html` (GLM-5.3) and `http://100.106.201.33:19012/volcano.html` (K3). Their preview servers must remain running until Charles ends the inspection.
 
 ## Important limitations and next controlled action
 
-The Q5 browser repair and 111K retrieval success justify retaining the route for further controlled work. They do not override the fresh agentic failure. Before considering a default-local coding promotion, rerun the fresh repository task with the test-execution path fixed in the agent harness and require repeated direct acceptance passes. Any future Kimi coding comparison needs a separately authorized executor profile; the existing managed Kimi profiles must remain advisor-only.
+The Q5 browser repair and 111K retrieval success justify retaining the route for further controlled work. They do not override the fresh agentic failure. Before considering a default-local coding promotion, rerun the fresh repository task with the test-execution path fixed in the agent harness and require repeated direct acceptance passes. The corrected K3 executor profile demonstrates that K3 can complete this bounded agentic task, but it does not establish a broad K3 coding ranking. Both remote browser calls failed to complete the raycaster artifact within the identical ten-minute bound, while their volcano artifacts were functional; that qualitative split should be preserved rather than collapsed into a single browser score.
 
 No active Floor code, policy, launcher, or runtime behavior was modified by this experiment. All model work occurred in disposable fixtures or the isolated GMKtec experiment root.
