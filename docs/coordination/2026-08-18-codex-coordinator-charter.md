@@ -1,8 +1,8 @@
 # GMKtec Coding-Benchmark Coordinator Charter
 
-**Coordinator session:** `c-coding-benchmark`  
-**Working root:** `/home/cdc/Storage/projects/coding-benchmark`  
-**Authority:** direct Charles Owner instruction, 2026-08-18  
+**Coordinator session:** `c-coding-benchmark`
+**Working root:** `/home/cdc/Storage/projects/coding-benchmark`
+**Authority:** direct Charles Owner instruction, 2026-08-18
 **Status:** temporary bounded exception while Floor communications/recovery are impaired
 
 ## Mission
