@@ -1,0 +1,60 @@
+{
+  "object": "list",
+  "data": [
+    {
+      "id": "GLM-4.7-Flash-UD-Q6_K_XL",
+      "object": "model",
+      "created": 1787181895,
+      "owned_by": "unsloth-studio",
+      "context_length": 65536,
+      "max_context_length": 202752,
+      "native_context_length": 202752,
+      "loaded": true
+    },
+    {
+      "id": "GEMMA",
+      "object": "model",
+      "created": 1787181895,
+      "owned_by": "unsloth-studio",
+      "loaded": false,
+      "quant": "UD-Q6_K_XL",
+      "display_name": "GEMMA"
+    },
+    {
+      "id": "GLM",
+      "object": "model",
+      "created": 1787181895,
+      "owned_by": "unsloth-studio",
+      "loaded": true,
+      "quant": "UD-Q6_K_XL",
+      "display_name": "GLM"
+    },
+    {
+      "id": "Q38-Q6",
+      "object": "model",
+      "created": 1787181895,
+      "owned_by": "unsloth-studio",
+      "loaded": false,
+      "quant": "Q6_K",
+      "display_name": "Q38-Q6"
+    },
+    {
+      "id": "Q38-UD",
+      "object": "model",
+      "created": 1787181895,
+      "owned_by": "unsloth-studio",
+      "loaded": false,
+      "quant": "UD-Q6_K_XL",
+      "display_name": "Q38-UD"
+    },
+    {
+      "id": "Q35-9",
+      "object": "model",
+      "created": 1787181895,
+      "owned_by": "unsloth-studio",
+      "loaded": false,
+      "quant": "UD-Q6_K_XL",
+      "display_name": "Q35-9"
+    }
+  ]
+}

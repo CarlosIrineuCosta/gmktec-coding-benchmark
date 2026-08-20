@@ -1,0 +1,13 @@
+id,model_id,reasoning,status,started_at,ended_at,elapsed_seconds,executed_web_searches,failure
+Q35-9-OFF,Q35-9,off,completed,2026-08-19T21:57:45.798061Z,2026-08-19T22:00:16.905666Z,146.07,,
+Q35-9-LOW,Q35-9,low,search_budget_violation,2026-08-19T22:11:35.155281Z,2026-08-19T22:20:07.574258Z,507.334,43,
+Q38-UD-OFF,Q38-UD,off,search_budget_violation,2026-08-19T22:20:07.638431Z,2026-08-19T22:33:58.904153Z,817.354,31,
+Q38-UD-LOW,Q38-UD,low,timed_out,2026-08-19T22:33:58.968435Z,2026-08-19T22:54:12.114849Z,1213.145,20,TimeoutError: timed out
+Q38-Q6-OFF,Q38-Q6,off,completed,2026-08-19T22:54:12.229570Z,2026-08-19T22:59:38.820117Z,318.515,19,
+Q38-Q6-LOW,Q38-Q6,low,timed_out,2026-08-19T22:59:38.934672Z,2026-08-19T23:19:52.960847Z,1214.025,8,TimeoutError: timed out
+GLM-OFF,GLM,off,completed,2026-08-20T00:06:21.952855Z,2026-08-20T00:10:14.515673Z,221.484,0,
+GLM-ON,GLM,enabled,failed,2026-08-19T23:24:46.389982Z,2026-08-19T23:24:55.342568Z,8.952,0,"RuntimeError: HTTP 400: {""error"":{""message"":""reasoning_effort: Input should be 'none', 'minimal', 'low', 'medium', 'high', 'max' or 'xhigh'"",""type"":""invalid_request_error"",""param"":""reasoning_effort"",""code"":null}}"
+GEMMA-OFF,GEMMA,off,completed,2026-08-20T00:10:14.580666Z,2026-08-20T00:11:05.934911Z,41.326,6,
+GEMMA-ON,GEMMA,enabled,failed,2026-08-19T23:27:15.813333Z,2026-08-19T23:27:22.866078Z,7.052,0,"RuntimeError: HTTP 400: {""error"":{""message"":""reasoning_effort: Input should be 'none', 'minimal', 'low', 'medium', 'high', 'max' or 'xhigh'"",""type"":""invalid_request_error"",""param"":""reasoning_effort"",""code"":null}}"
+Q38-UD-HIGH,Q38-UD,high,completed,2026-08-19T23:27:22.930179Z,2026-08-19T23:42:15.451157Z,880.47,17,
+Q38-Q6-HIGH,Q38-Q6,high,failed,2026-08-19T23:42:15.516349Z,2026-08-20T00:01:43.983359Z,1168.466,19,"RuntimeError: HTTP 400: {""error"":{""message"":""Message too long: 77411 tokens exceeds the 65536-token context window. Try increasing the Context Length in Model settings, or shorten the conversation."",""type"":""invalid_request_error"",""param"":""messages"",""code"":""context_length_exceeded""}}"

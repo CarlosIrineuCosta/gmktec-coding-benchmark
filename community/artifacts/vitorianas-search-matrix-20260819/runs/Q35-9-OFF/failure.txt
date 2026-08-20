@@ -1,0 +1,1 @@
+RuntimeError: HTTP 400: {"error":{"message":"confirm_tool_calls requires stream=true for local tool execution.","type":"invalid_request_error","param":"confirm_tool_calls","code":"invalid_request_error"}}

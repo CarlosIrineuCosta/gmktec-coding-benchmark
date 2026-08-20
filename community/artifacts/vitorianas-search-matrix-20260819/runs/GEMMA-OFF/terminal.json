@@ -1,0 +1,26 @@
+{
+  "id": "GEMMA-OFF",
+  "model_id": "GEMMA",
+  "reasoning": "off",
+  "started_at": "2026-08-20T00:10:14.580666Z",
+  "status": "completed",
+  "model": {
+    "id": "GEMMA",
+    "repository": "unsloth/gemma-4-26B-A4B-it-GGUF",
+    "filename": "gemma-4-26B-A4B-it-UD-Q6_K_XL.gguf",
+    "revision": "c099eb48e663fd284577b04978a94ffccb261841",
+    "bytes": 23295391456,
+    "sha256": "b01ee10a1423c17f9c4384f1fc569726b8782c5403557ff138ceb9468ca49d6b",
+    "hf_lfs_sha256": "b01ee10a1423c17f9c4384f1fc569726b8782c5403557ff138ceb9468ca49d6b",
+    "local_path": "/srv/llm-runner/experiments/vitorianas-search-matrix-20260819/models/GEMMA/gemma-4-26B-A4B-it-UD-Q6_K_XL.gguf",
+    "verified_at": "2026-08-19T07:47:25.919412Z"
+  },
+  "sampling": {
+    "studio_model_detected_defaults": true
+  },
+  "tool_ceiling": 20,
+  "cell_timeout_seconds": 1200,
+  "elapsed_seconds": 41.326,
+  "executed_web_searches": 6,
+  "ended_at": "2026-08-20T00:11:05.934911Z"
+}

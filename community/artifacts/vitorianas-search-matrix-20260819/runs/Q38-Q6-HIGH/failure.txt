@@ -1,0 +1,1 @@
+RuntimeError: HTTP 400: {"error":{"message":"Message too long: 77411 tokens exceeds the 65536-token context window. Try increasing the Context Length in Model settings, or shorten the conversation.","type":"invalid_request_error","param":"messages","code":"context_length_exceeded"}}
