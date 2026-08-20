@@ -1,0 +1,30 @@
+{
+  "id": "Q35-9-LOW",
+  "model_id": "Q35-9",
+  "reasoning": "low",
+  "started_at": "2026-08-19T22:11:35.155281Z",
+  "status": "search_budget_violation",
+  "model": {
+    "id": "Q35-9",
+    "repository": "unsloth/Qwen3.5-9B-GGUF",
+    "filename": "Qwen3.5-9B-UD-Q6_K_XL.gguf",
+    "revision": "3885219b6810b007914f3a7950a8d1b469d598a5",
+    "bytes": 8756929760,
+    "sha256": "33b0050fb9c19abcf815647a78464dad959a06dadaecb0b96af798669f9074d4",
+    "hf_lfs_sha256": "33b0050fb9c19abcf815647a78464dad959a06dadaecb0b96af798669f9074d4",
+    "local_path": "/srv/llm-runner/experiments/vitorianas-search-matrix-20260819/models/Q35-9/Qwen3.5-9B-UD-Q6_K_XL.gguf",
+    "verified_at": "2026-08-19T07:30:01.585036Z"
+  },
+  "sampling": {
+    "temperature": 0.6,
+    "top_p": 0.95,
+    "top_k": 20,
+    "min_p": 0,
+    "repetition_penalty": 1.0
+  },
+  "tool_ceiling": 20,
+  "cell_timeout_seconds": 1200,
+  "elapsed_seconds": 507.334,
+  "executed_web_searches": 43,
+  "ended_at": "2026-08-19T22:20:07.574258Z"
+}

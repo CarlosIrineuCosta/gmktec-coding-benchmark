@@ -2,6 +2,11 @@
 # published directly. They belong under the explicit private-data boundary.
 data/private/
 
+# Durable local benchmark archives. These preserve reproducible experiment
+# waypoints while keeping fixtures, generated artifacts, and provider-adjacent
+# evidence out of the public repository.
+.local/experiments/
+
 # Common secret and runtime formats.
 .env
 .env.*

@@ -1,0 +1,31 @@
+{
+  "id": "GEMMA-ON",
+  "model_id": "GEMMA",
+  "reasoning": "enabled",
+  "started_at": "2026-08-19T23:27:15.813333Z",
+  "status": "failed",
+  "model": {
+    "id": "GEMMA",
+    "repository": "unsloth/gemma-4-26B-A4B-it-GGUF",
+    "filename": "gemma-4-26B-A4B-it-UD-Q6_K_XL.gguf",
+    "revision": "c099eb48e663fd284577b04978a94ffccb261841",
+    "bytes": 23295391456,
+    "sha256": "b01ee10a1423c17f9c4384f1fc569726b8782c5403557ff138ceb9468ca49d6b",
+    "hf_lfs_sha256": "b01ee10a1423c17f9c4384f1fc569726b8782c5403557ff138ceb9468ca49d6b",
+    "local_path": "/srv/llm-runner/experiments/vitorianas-search-matrix-20260819/models/GEMMA/gemma-4-26B-A4B-it-UD-Q6_K_XL.gguf",
+    "verified_at": "2026-08-19T07:47:25.919412Z"
+  },
+  "sampling": {
+    "temperature": 0.6,
+    "top_p": 0.95,
+    "top_k": 20,
+    "min_p": 0,
+    "repetition_penalty": 1.0
+  },
+  "tool_ceiling": 20,
+  "cell_timeout_seconds": 1200,
+  "elapsed_seconds": 7.052,
+  "failure": "RuntimeError: HTTP 400: {\"error\":{\"message\":\"reasoning_effort: Input should be 'none', 'minimal', 'low', 'medium', 'high', 'max' or 'xhigh'\",\"type\":\"invalid_request_error\",\"param\":\"reasoning_effort\",\"code\":null}}",
+  "executed_web_searches": 0,
+  "ended_at": "2026-08-19T23:27:22.866078Z"
+}
