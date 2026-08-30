@@ -8,6 +8,7 @@ It therefore cannot become an autonomous hidden supervisor.
 from __future__ import annotations
 
 import json
+import fcntl
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -120,13 +121,19 @@ class PilotRunController:
             raise RuntimeError("terminal runs cannot receive another model turn")
         if self.store.phase not in {RunPhase.AUTONOMOUS, RunPhase.SUPERVISED_RECOVERY}:
             raise RuntimeError(f"model turn cannot start in phase {self.store.phase}")
-        tools = WorkspaceTools(Path(self.state["workspace"]), environment=self.state.get("tool_environment", {}))
-        session = OpenAICompatibleSession(
-            self.state["endpoint"], self.state["model"], self.store, tools
-        )
-        result = session.one_turn(
-            self.state["messages"], TOOL_DEFINITIONS, self.state["request_options"]
-        )
+        lock_path = self.store.run_dir / "active-turn.lock"
+        with lock_path.open("w", encoding="utf-8") as lock:
+            try:
+                fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            except BlockingIOError as exc:
+                raise RuntimeError("another controller turn is already active for this run") from exc
+            tools = WorkspaceTools(Path(self.state["workspace"]), environment=self.state.get("tool_environment", {}))
+            session = OpenAICompatibleSession(
+                self.state["endpoint"], self.state["model"], self.store, tools
+            )
+            result = session.one_turn(
+                self.state["messages"], TOOL_DEFINITIONS, self.state["request_options"]
+            )
         assistant = result["assistant"]
         self.state["messages"].append(assistant)
         for item in result["tool_results"]:
