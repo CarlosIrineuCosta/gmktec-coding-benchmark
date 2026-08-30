@@ -40,6 +40,30 @@ class EvidenceStore:
         (self._run_dir / "interventions.jsonl").touch()
         _write_json(self._run_dir / "metrics.json", {"run_id": self.run_id, "created_at": utc_now()})
 
+    @classmethod
+    def resume(cls, root: Path, run_id: str) -> "EvidenceStore":
+        """Re-open durable evidence without creating or overwriting files.
+
+        A real candidate run is intentionally advanced one model turn at a
+        time so its human supervisor can inspect it between turns.  This
+        helper recovers the last recorded phase from the append-only event
+        log.  It does not repair, truncate, or otherwise reinterpret history.
+        """
+        instance = object.__new__(cls)
+        instance.root = root
+        instance.run_id = run_id
+        instance._run_dir = root / "runs" / run_id
+        if not instance._run_dir.is_dir():
+            raise FileNotFoundError(f"run evidence does not exist: {instance._run_dir}")
+        instance.phase = RunPhase.PREPARED
+        events = instance._run_dir / "events.jsonl"
+        if events.exists():
+            for line in events.read_text(encoding="utf-8").splitlines():
+                record = json.loads(line)
+                if record.get("type") == "phase_changed":
+                    instance.phase = RunPhase(record["target"])
+        return instance
+
     @property
     def run_dir(self) -> Path:
         return self._run_dir

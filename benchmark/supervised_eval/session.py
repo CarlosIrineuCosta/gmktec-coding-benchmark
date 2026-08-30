@@ -32,8 +32,18 @@ class OpenAICompatibleSession:
         with urllib.request.urlopen(request, timeout=900) as response:
             return json.loads(response.read().decode())
 
-    def one_turn(self, messages: list[dict[str, Any]], tool_definitions: list[dict[str, Any]]) -> dict[str, Any]:
+    def one_turn(
+        self,
+        messages: list[dict[str, Any]],
+        tool_definitions: list[dict[str, Any]],
+        request_options: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
         payload = {"model": self.model, "messages": messages, "tools": tool_definitions, "tool_choice": "auto"}
+        if request_options:
+            forbidden = {"model", "messages", "tools", "tool_choice"}.intersection(request_options)
+            if forbidden:
+                raise ValueError(f"request options cannot override protocol keys: {sorted(forbidden)}")
+            payload.update(request_options)
         started = time.monotonic()
         response = self._post(payload)
         elapsed_ms = round((time.monotonic() - started) * 1000, 3)

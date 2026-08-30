@@ -8,6 +8,7 @@ from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 from benchmark.supervised_eval.contracts import RunPhase, TerminalClass
+from benchmark.supervised_eval.controller import PilotRunController
 from benchmark.supervised_eval.evidence import EvidenceStore
 from benchmark.supervised_eval.harness import WorkspaceTools
 from benchmark.supervised_eval.gallery_fixture import materialize
@@ -107,6 +108,34 @@ class SupervisedEvaluationSetupTests(unittest.TestCase):
             result = session.one_turn([{"role": "user", "content": "mock"}], TOOL_DEFINITIONS)
             self.assertEqual(result["tool_results"][0]["result"]["written"], "result.txt")
             self.assertEqual((workspace / "result.txt").read_text(), "fake")
+
+    def test_controller_persists_native_tool_messages_and_requires_explicit_terminal(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            workspace = root / "workspace"
+            workspace.mkdir()
+            controller = PilotRunController.create(
+                root, "controller-run", manifest={"task_family": "gallery"},
+                endpoint="http://fake.invalid/v1", model="fake", workspace=workspace,
+                initial_message="make a result", request_options={"temperature": 0.4},
+            )
+            calls = []
+
+            def fake_post(payload: dict[str, object]) -> dict[str, object]:
+                calls.append(payload)
+                return {"choices": [{"message": {"role": "assistant", "tool_calls": [{"id": "call-1", "type": "function", "function": {"name": "write_file", "arguments": '{"path":"result.txt","content":"done"}'}}]}}]}
+
+            session = OpenAICompatibleSession("http://fake.invalid/v1", "fake", controller.store, WorkspaceTools(workspace), fake_post)
+            original = OpenAICompatibleSession
+            with patch("benchmark.supervised_eval.controller.OpenAICompatibleSession", return_value=session):
+                result = controller.one_turn()
+            self.assertEqual(result.tool_results[0]["result"]["written"], "result.txt")
+            resumed = PilotRunController(root, "controller-run")
+            self.assertEqual(resumed.state["messages"][-1]["role"], "tool")
+            self.assertEqual(calls[0]["temperature"], 0.4)
+            resumed.checkpoint(decision="continue", basis="mock tool made its edit", progress_observed=True)
+            resumed.terminal(TerminalClass.ACCEPTED, "mock accepted", "# mock\n")
+            self.assertTrue(PilotRunController(root, "controller-run").state["terminal"])
 
     def test_pilot_configuration_refuses_unselected_models(self) -> None:
         config = Path(__file__).resolve().parents[1] / "tasks/local-model-evaluation/pilot.json"
