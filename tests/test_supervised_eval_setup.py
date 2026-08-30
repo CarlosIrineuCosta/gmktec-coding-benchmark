@@ -56,6 +56,10 @@ class SupervisedEvaluationSetupTests(unittest.TestCase):
             self.assertEqual(tools.call("write_file", {"path": "nested/a.txt", "content": "ok"})["written"], "nested/a.txt")
             self.assertEqual(tools.call("read_file", {"path": "nested/a.txt"})["content"], "ok")
             self.assertEqual(tools.call("search_files", {"query": "ok"})["matches"][0]["path"], "nested/a.txt")
+            (workspace / "node_modules").mkdir()
+            (workspace / "node_modules" / "generated.txt").write_text("ok", encoding="utf-8")
+            self.assertNotIn("node_modules/generated.txt", tools.call("list_files", {"path": "."})["files"])
+            self.assertEqual(len(tools.call("search_files", {"query": "ok"})["matches"]), 1)
             self.assertEqual(tools.call("patch_file", {"path": "nested/a.txt", "old": "ok", "new": "better"})["patched"], "nested/a.txt")
             with self.assertRaises(ValueError):
                 tools.call("read_file", {"path": "../outside.txt"})

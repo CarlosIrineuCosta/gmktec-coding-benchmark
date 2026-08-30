@@ -28,19 +28,39 @@ class WorkspaceTools:
             raise ValueError("path escapes isolated workspace")
         return target
 
+    def _files(self, root: Path) -> list[Path]:
+        """Return a bounded source-oriented file view for candidate tools.
+
+        Dependency and build trees are implementation-independent fixture
+        machinery. Including them makes a simple root listing produce an
+        enormous tool result and can consume a material part of a candidate's
+        context window before it has inspected its actual task.
+        """
+        ignored = {".git", "node_modules", "dist", "build", "__pycache__"}
+        files: list[Path] = []
+        for path in root.rglob("*"):
+            relative = path.relative_to(self.workspace)
+            if any(part in ignored for part in relative.parts):
+                continue
+            if path.is_file():
+                files.append(path)
+                if len(files) >= 200:
+                    break
+        return files
+
     def call(self, name: str, arguments: dict[str, Any]) -> dict[str, Any]:
         if name == "read_file":
             return {"content": self._path(arguments["path"]).read_text(encoding="utf-8")}
         if name == "list_files":
             root = self._path(arguments.get("path", "."))
-            return {"files": sorted(str(path.relative_to(self.workspace)) for path in root.rglob("*") if path.is_file())}
+            return {"files": sorted(str(path.relative_to(self.workspace)) for path in self._files(root))}
         if name == "search_files":
             query = arguments["query"]
             if not isinstance(query, str) or not query:
                 raise ValueError("query must be a non-empty string")
             matches: list[dict[str, object]] = []
-            for path in self.workspace.rglob("*"):
-                if not path.is_file() or len(matches) >= 200:
+            for path in self._files(self.workspace):
+                if len(matches) >= 200:
                     continue
                 try:
                     for number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
