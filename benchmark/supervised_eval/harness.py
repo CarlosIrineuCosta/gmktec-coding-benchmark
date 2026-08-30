@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 from pathlib import Path
 from typing import Any
@@ -18,9 +19,10 @@ TOOL_DEFINITIONS = [
 
 
 class WorkspaceTools:
-    def __init__(self, workspace: Path, command_timeout_seconds: int = 120) -> None:
+    def __init__(self, workspace: Path, command_timeout_seconds: int = 120, environment: dict[str, str] | None = None) -> None:
         self.workspace = workspace.resolve()
         self.command_timeout_seconds = command_timeout_seconds
+        self.environment = environment or {}
 
     def _path(self, relative: str) -> Path:
         target = (self.workspace / relative).resolve()
@@ -90,7 +92,15 @@ class WorkspaceTools:
             argv = arguments["argv"]
             if not isinstance(argv, list) or not argv or not all(isinstance(item, str) for item in argv):
                 raise ValueError("argv must be a non-empty string array")
-            completed = subprocess.run(argv, cwd=self.workspace, text=True, capture_output=True, timeout=self.command_timeout_seconds, check=False)
+            completed = subprocess.run(
+                argv,
+                cwd=self.workspace,
+                text=True,
+                capture_output=True,
+                timeout=self.command_timeout_seconds,
+                check=False,
+                env={**os.environ, **self.environment},
+            )
             return {"exit_code": completed.returncode, "stdout": completed.stdout[-30000:], "stderr": completed.stderr[-30000:]}
         raise ValueError(f"tool is not allowed: {name}")
 

@@ -28,6 +28,7 @@ def main() -> int:
     create.add_argument("--workspace", required=True, type=Path)
     create.add_argument("--message-file", required=True, type=Path)
     create.add_argument("--request-options", type=_json, default={})
+    create.add_argument("--tool-environment", type=_json, default={})
     checkpoint = commands.add_parser("checkpoint")
     checkpoint.add_argument("--decision", required=True)
     checkpoint.add_argument("--basis", required=True)
@@ -47,7 +48,7 @@ def main() -> int:
             args.evidence_root, args.run_id, manifest=args.manifest, endpoint=args.endpoint,
             model=args.model, workspace=args.workspace,
             initial_message=args.message_file.read_text(encoding="utf-8"),
-            request_options=args.request_options,
+            request_options=args.request_options, tool_environment=args.tool_environment,
         )
         print(json.dumps({"created": controller.state_path.as_posix()}))
         return 0

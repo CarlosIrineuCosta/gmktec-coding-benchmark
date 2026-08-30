@@ -67,6 +67,14 @@ class SupervisedEvaluationSetupTests(unittest.TestCase):
             self.assertEqual(result["exit_code"], 0)
             self.assertIn("bounded", result["stdout"])
 
+    def test_workspace_tool_environment_is_explicitly_inherited(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            workspace = Path(tmp) / "work"
+            workspace.mkdir()
+            tools = WorkspaceTools(workspace, environment={"PILOT_TEST_VALUE": "candidate-visible"})
+            result = tools.call("run_command", {"argv": [sys.executable, "-c", "import os; print(os.environ['PILOT_TEST_VALUE'])"]})
+            self.assertEqual(result["stdout"].strip(), "candidate-visible")
+
     def test_disposable_dummy_server_stops(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             fake_process = MagicMock()

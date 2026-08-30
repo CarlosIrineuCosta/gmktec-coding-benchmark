@@ -65,6 +65,7 @@ class PilotRunController:
         workspace: Path,
         initial_message: str,
         request_options: dict[str, Any] | None = None,
+        tool_environment: dict[str, str] | None = None,
     ) -> "PilotRunController":
         store = EvidenceStore(evidence_root, run_id)
         manifest = {**manifest, "run_id": run_id}
@@ -73,6 +74,7 @@ class PilotRunController:
             "endpoint": endpoint,
             "model": model,
             "request_options": request_options or {},
+            "tool_environment": tool_environment or {},
             "tool_contract": "native_openai_function_tools",
         })
         store.transition(RunPhase.SERVER_STARTING, "disposable server command recorded by caller")
@@ -85,6 +87,7 @@ class PilotRunController:
             "model": model,
             "workspace": str(workspace.resolve()),
             "request_options": request_options or {},
+            "tool_environment": tool_environment or {},
             "messages": [{"role": "user", "content": initial_message}],
             "turn_count": 0,
             "tool_call_count": 0,
@@ -117,7 +120,7 @@ class PilotRunController:
             raise RuntimeError("terminal runs cannot receive another model turn")
         if self.store.phase not in {RunPhase.AUTONOMOUS, RunPhase.SUPERVISED_RECOVERY}:
             raise RuntimeError(f"model turn cannot start in phase {self.store.phase}")
-        tools = WorkspaceTools(Path(self.state["workspace"]))
+        tools = WorkspaceTools(Path(self.state["workspace"]), environment=self.state.get("tool_environment", {}))
         session = OpenAICompatibleSession(
             self.state["endpoint"], self.state["model"], self.store, tools
         )
