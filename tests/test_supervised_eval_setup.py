@@ -84,8 +84,12 @@ class SupervisedEvaluationSetupTests(unittest.TestCase):
             self.assertEqual(artifact["bytes"], 10)
             manifest = capture([model], hash_files=False)
             self.assertEqual(manifest["models"][0]["filename"], "example.gguf")
-        root = Path(__file__).resolve().parents[1] / "data/private/code-review"
-        self.assertEqual(validate_private_code_review_fixture(root)["gold_defects"], 3)
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "code-review"
+            (root / "fixture").mkdir(parents=True)
+            (root / "fixture/service.py").write_text("def f():\n    return 1\n", encoding="utf-8")
+            (root / "gold.json").write_text('{"maximum_findings": 8, "defects": [{"id": "mock"}]}', encoding="utf-8")
+            self.assertEqual(validate_private_code_review_fixture(root)["gold_defects"], 1)
 
     def test_fake_model_tool_trajectory_is_logged_without_network(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
