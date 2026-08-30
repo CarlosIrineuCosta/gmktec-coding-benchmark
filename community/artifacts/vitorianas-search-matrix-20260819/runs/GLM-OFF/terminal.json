@@ -1,0 +1,29 @@
+{
+  "id": "GLM-OFF",
+  "model_id": "GLM",
+  "reasoning": "off",
+  "started_at": "2026-08-20T00:06:21.952855Z",
+  "status": "completed",
+  "model": {
+    "id": "GLM",
+    "repository": "unsloth/GLM-4.7-Flash-GGUF",
+    "filename": "GLM-4.7-Flash-UD-Q6_K_XL.gguf",
+    "revision": "0d32489ecb9db6d2a4fc93bd27ef01519f95474d",
+    "bytes": 26175238496,
+    "sha256": "b5ddf6a5531a4d06ce84a652419c8d32c0cb15ca64549d715f783de948a3f3e2",
+    "hf_lfs_sha256": "b5ddf6a5531a4d06ce84a652419c8d32c0cb15ca64549d715f783de948a3f3e2",
+    "local_path": "/srv/llm-runner/experiments/vitorianas-search-matrix-20260819/models/GLM/GLM-4.7-Flash-UD-Q6_K_XL.gguf",
+    "verified_at": "2026-08-19T07:43:05.518289Z"
+  },
+  "sampling": {
+    "temperature": 0.7,
+    "top_p": 1.0,
+    "min_p": 0.01,
+    "repetition_penalty": 1.0
+  },
+  "tool_ceiling": 20,
+  "cell_timeout_seconds": 1200,
+  "elapsed_seconds": 221.484,
+  "executed_web_searches": 0,
+  "ended_at": "2026-08-20T00:10:14.515673Z"
+}

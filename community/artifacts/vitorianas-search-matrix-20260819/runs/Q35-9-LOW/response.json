@@ -1,0 +1,36 @@
+{
+  "id": "chatcmpl-91be5b560d8a",
+  "object": "chat.completion",
+  "created": 1787177500,
+  "model": "Qwen3.5-9B-UD-Q6_K_XL",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "",
+        "refusal": null,
+        "reasoning_content": "I need to continue searching for more specific titles and verify what I've found. Let me search for some of the remaining authors and their works.\n\nBased on my searches so far, I have found:\n\n1. Elizabeth Gaskell - \"The Old Nurse's Story\" (matches \"O Conto da Velha Ama\")\n2. Mary Braddon - Need to confirm \"The Shadow of Death\" \n3. Margaret Oliphant - \"The Library Window\" (matches \"A Janela da Biblioteca\")\n4. Rhoda Broughton - \"The Truth, the Whole Truth, and Nothing but the Truth\" (matches)\n5. H.D. Everett - Found \"Anne's Little Ghost\" and \"The Death Mask: And Other Ghosts\" collection - but need to find \"Curse of the Dead\" story\n6. Vernon Lee - \"Amour Dure\" appears to be a real title by her (supernatural fiction)\n7. May Sinclair - Need to find her ghost story matching that Portuguese title\n8. Charlotte Riddell - Found references to ghost stories but need to confirm \"The Left Door\"\n9. Louisa Baldwin - \"How He Left the Hotel\" or related elevator story (matches \"O Mist\u00e9rio do Elevador\")\n10. Edith Nesbit - Found \"Man and Maid\" which contains various stories including \"The Haunted Inheritance\" but need marble connection\n11. Violet Hunt - \"The Prayer\" (matches \"A Prece\")\n12. Amelia B. Edwards - \"The Phantom Coach\" or similar (matches \"O Coche Fantasma\")\n13. Charlotte Bront\u00eb - \"Napoleon and the Spectre\" (matches)\n\nLet me continue searching for the remaining ones I haven't confirmed yet, particularly H.D. Everett's \"Curse of the Dead,\" May Sinclair's work, and verify some others.\n",
+        "tool_calls": null
+      },
+      "finish_reason": "stop",
+      "logprobs": null
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 34922,
+    "completion_tokens": 6589,
+    "total_tokens": 41511,
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "audio_tokens": 0
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 0,
+      "audio_tokens": 0,
+      "accepted_prediction_tokens": 0,
+      "rejected_prediction_tokens": 0
+    }
+  },
+  "system_fingerprint": null
+}

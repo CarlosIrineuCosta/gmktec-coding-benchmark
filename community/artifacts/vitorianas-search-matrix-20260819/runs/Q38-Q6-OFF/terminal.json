@@ -1,0 +1,30 @@
+{
+  "id": "Q38-Q6-OFF",
+  "model_id": "Q38-Q6",
+  "reasoning": "off",
+  "started_at": "2026-08-19T22:54:12.229570Z",
+  "status": "completed",
+  "model": {
+    "id": "Q38-Q6",
+    "repository": "unsloth/Qwen3.8-27B-GGUF",
+    "filename": "Qwen3.8-27B-Q6_K.gguf",
+    "revision": "f1bfb127c64f7072bdd2cad55f258b9c8b2910fe",
+    "bytes": 22884408288,
+    "sha256": "562fbf760503008f118e5df38de5b3e97992d1f693f475815631198547486727",
+    "hf_lfs_sha256": "562fbf760503008f118e5df38de5b3e97992d1f693f475815631198547486727",
+    "local_path": "/srv/llm-runner/experiments/vitorianas-search-matrix-20260819/models/Q38-Q6/Qwen3.8-27B-Q6_K.gguf",
+    "verified_at": "2026-08-19T07:38:29.027344Z"
+  },
+  "sampling": {
+    "temperature": 0.7,
+    "top_p": 0.8,
+    "top_k": 20,
+    "min_p": 0,
+    "repetition_penalty": 1.0
+  },
+  "tool_ceiling": 20,
+  "cell_timeout_seconds": 1200,
+  "elapsed_seconds": 318.515,
+  "executed_web_searches": 19,
+  "ended_at": "2026-08-19T22:59:38.820117Z"
+}
