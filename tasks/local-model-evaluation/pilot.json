@@ -1,10 +1,36 @@
 {
   "suite": "local-model-evaluation-20260830",
-  "status": "awaiting_owner_model_selection",
-  "pilot_models": [null, null],
-  "task_families": ["gallery", "code_review", "translation"],
-  "execution_forbidden_until": [
-    "owner names exact two pilot models",
-    "owner supplies literary translation source"
-  ]
+  "status": "pilot_authorized",
+  "pilot_models": [
+    {
+      "id": "qwen3.8-flash-next-ud-q3-k-xl",
+      "repository": "unsloth/Qwen3.8-Flash-Next-GGUF",
+      "quant": "UD-Q3_K_XL",
+      "artifact_resolution": "resolve exact installed snapshot/shards from /home/cdc/Models/Unsloth/huggingface; do not substitute another quant"
+    },
+    {
+      "id": "llama-3.3-nemotron-super-49b-v1-ud-q6-k-xl",
+      "repository": "unsloth/Llama-3_3-Nemotron-Super-49B-v1-GGUF",
+      "quant": "UD-Q6_K_XL",
+      "artifact_resolution": "resolve exact installed snapshot/artifact from /home/cdc/Models/Unsloth/huggingface; do not substitute another quant"
+    }
+  ],
+  "task_families": ["gallery", "code_review"],
+  "translation": {
+    "status": "deferred_pending_owner_source",
+    "blocks_pilot": false
+  },
+  "pilot_policy": {
+    "run_order": [
+      "qwen3.8-flash-next-ud-q3-k-xl:gallery",
+      "qwen3.8-flash-next-ud-q3-k-xl:code_review",
+      "llama-3.3-nemotron-super-49b-v1-ud-q6-k-xl:gallery",
+      "llama-3.3-nemotron-super-49b-v1-ud-q6-k-xl:code_review"
+    ],
+    "sequential_only": true,
+    "one_candidate_server_at_a_time": true,
+    "initial_context_ceiling": 65536,
+    "rerun_completed_pilot_in_full_suite": false
+  },
+  "execution_forbidden_until": []
 }
