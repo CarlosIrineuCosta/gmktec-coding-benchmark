@@ -96,11 +96,11 @@ Follow the owner-defined surfaces:
 
 Do not commit model weights, HF caches, secrets, large raw logs, virtual environments, node_modules, or operational authentication material.
 
-## Important repository visibility check
+## Public repository boundary
 
-The owner stated that the repository is private. At the time GPT accessed it through the GitHub connector on 2026-08-30, repository metadata unexpectedly reported `visibility: public`.
+The repository is intentionally public so GPT/ChatGPT and other collaborators can reliably access the tracked coordination surface.
 
-Before putting any machine-specific, private, or sensitive material into tracked Git, independently verify repository visibility from the local GitHub/`gh` environment or GitHub UI. Until resolved, tracked additions should remain non-secret and sanitizable.
+This does not change the secrecy boundary: tracked Git content must remain sanitizable and non-secret. Raw outputs, hidden gold data, local run state, credentials, unredacted transcripts, authentication material, and anything potentially secret remain under the gitignored `data/private/` boundary or another explicitly local-only surface. Existing Floor/Codex safety rules against exposing secrets continue to apply.
 
 ## Stop condition for setup
 
