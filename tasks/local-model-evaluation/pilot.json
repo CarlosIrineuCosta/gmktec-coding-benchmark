@@ -1,0 +1,10 @@
+{
+  "suite": "local-model-evaluation-20260830",
+  "status": "awaiting_owner_model_selection",
+  "pilot_models": [null, null],
+  "task_families": ["gallery", "code_review", "translation"],
+  "execution_forbidden_until": [
+    "owner names exact two pilot models",
+    "owner supplies literary translation source"
+  ]
+}

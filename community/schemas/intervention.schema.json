@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Allowed supervisory intervention",
+  "type": "object",
+  "required": ["at", "class", "decision", "basis"],
+  "properties": {
+    "at": {"type": "string", "format": "date-time"},
+    "class": {"enum": ["I0_infrastructure", "I1_diagnostic", "I2_criterion_reminder", "I3_directional_hint"]},
+    "decision": {"type": "string", "minLength": 1},
+    "basis": {"type": "string", "minLength": 1}
+  },
+  "additionalProperties": false
+}

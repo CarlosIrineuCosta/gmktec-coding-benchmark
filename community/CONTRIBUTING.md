@@ -1,6 +1,6 @@
 # Contributing reproducible local-model results
 
-Contributions are welcome after the public repository exists. A result should
+Contributions are welcome. A result should
 be treated as diagnostic evidence, not as a leaderboard claim, unless it is
 independently reproducible.
 

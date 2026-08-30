@@ -3,9 +3,18 @@
 Last updated: 2026-08-16.  This is the restart checklist.  Read it before
 launching another model task.
 
+> **Historical campaign notice (2026-08-30):** this document records the
+> retired August 16 `llm-runner` campaign. For new evaluation execution, follow
+> `docs/architecture/2026-08-30-supervised-unsloth-evaluation.md` and
+> `docs/handoffs/2026-08-30-local-model-evaluation-coordinator.md` instead.
+> The active account is `cdc`; the single authoritative managed model store is
+> `/home/cdc/Models/Unsloth/huggingface/`. Do not duplicate GGUFs into an
+> experiment directory, `/srv/llm-runner`, or another cache. `old-tests/`
+> contains completed-test evidence only and remains separate from the new suite.
+
 ## Current position
 
-- The benchmark repository is private: `CarlosIrineuCosta/gmktec-coding-benchmark`.
+- The benchmark repository is public: `CarlosIrineuCosta/gmktec-coding-benchmark`.
 - The first real Historical pair is frozen in
   `docs/reports/2026-08-16-suite-v2-historical-pair.md`.
 - No patch has been promoted to The Floor or any canonical repository.

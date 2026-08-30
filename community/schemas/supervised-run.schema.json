@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/CarlosIrineuCosta/gmktec-coding-benchmark/community/schemas/supervised-run.schema.json",
+  "title": "Supervised local-model evaluation manifest",
+  "type": "object",
+  "required": ["run_id", "task_family", "artifact", "server", "tool_contract"],
+  "properties": {
+    "run_id": {"type": "string", "minLength": 1},
+    "task_family": {"enum": ["gallery", "code_review", "translation"]},
+    "model_label": {"type": ["string", "null"]},
+    "artifact": {
+      "type": "object",
+      "required": ["repository", "revision", "filename", "bytes"],
+      "properties": {
+        "repository": {"type": "string"},
+        "revision": {"type": "string"},
+        "filename": {"type": "string"},
+        "bytes": {"type": "integer", "minimum": 1},
+        "sha256": {"type": ["string", "null"]}
+      }
+    },
+    "server": {"type": "object"},
+    "tool_contract": {"type": "string"},
+    "context": {"type": ["integer", "null"], "minimum": 1},
+    "reasoning": {"type": ["object", "null"]},
+    "sampling": {"type": ["object", "null"]}
+  },
+  "additionalProperties": true
+}

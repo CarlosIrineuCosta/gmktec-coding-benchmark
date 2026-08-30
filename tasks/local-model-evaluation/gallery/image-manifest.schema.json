@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "array",
+  "minItems": 12,
+  "maxItems": 16,
+  "items": {
+    "type": "object",
+    "required": ["id", "local_filename", "source_page", "license", "sha256", "width", "height"],
+    "properties": {
+      "id": {"type": "string"},
+      "local_filename": {"type": "string"},
+      "source_page": {"type": "string", "format": "uri"},
+      "creator": {"type": ["string", "null"]},
+      "license": {"type": "string"},
+      "sha256": {"type": "string"},
+      "width": {"type": "integer", "minimum": 1},
+      "height": {"type": "integer", "minimum": 1}
+    },
+    "additionalProperties": false
+  }
+}

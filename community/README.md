@@ -1,7 +1,7 @@
 # Community publication area
 
-This directory is the deliberately sanitized boundary for material that may
-later be published from the private GMKtec coding benchmark repository.
+This directory is the deliberately sanitized boundary for material published
+from the public GMKtec coding benchmark repository.
 
 It contains no provider profiles, credentials, private project snapshots,
 hidden acceptance tests, candidate worktrees, or unredacted model transcripts.
@@ -32,8 +32,7 @@ Translations should state the source revision they correspond to. Benchmark
 data, hashes, commands, model identifiers, and error messages must not be
 silently localized or altered.
 
-## Intended public-repository boundary
+## Public-repository boundary
 
-A future public repository should be assembled from a reviewed export of this
-directory plus purpose-built generic harness code. It should not be created by
-changing the private repository's visibility.
+The repository is public by owner decision. Publication remains a per-file
+review: only sanitized, non-secret material may be committed here.
