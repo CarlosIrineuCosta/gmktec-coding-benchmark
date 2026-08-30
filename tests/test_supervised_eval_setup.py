@@ -10,6 +10,7 @@ from unittest.mock import MagicMock, patch
 from benchmark.supervised_eval.contracts import RunPhase, TerminalClass
 from benchmark.supervised_eval.evidence import EvidenceStore
 from benchmark.supervised_eval.harness import WorkspaceTools
+from benchmark.supervised_eval.gallery_fixture import materialize
 from benchmark.supervised_eval.inventory import capture, model_artifact
 from benchmark.supervised_eval.lifecycle import DisposableServer, reserve_loopback_port
 from benchmark.supervised_eval.pilot import selected_pilot_models
@@ -111,6 +112,14 @@ class SupervisedEvaluationSetupTests(unittest.TestCase):
         config = Path(__file__).resolve().parents[1] / "tasks/local-model-evaluation/pilot.json"
         with self.assertRaises(ValueError):
             selected_pilot_models(config)
+
+    def test_gallery_fixture_plan_has_fixed_public_domain_sources(self) -> None:
+        source_path = Path(__file__).resolve().parents[1] / "tasks/local-model-evaluation/gallery/sources.json"
+        sources = json.loads(source_path.read_text(encoding="utf-8"))
+        with tempfile.TemporaryDirectory() as tmp:
+            plan = materialize(sources, Path(tmp) / "images", fetch=False)
+        self.assertEqual(len(plan), 12)
+        self.assertTrue(all(item["license"] == "public-domain" for item in plan))
 
 
 if __name__ == "__main__":
