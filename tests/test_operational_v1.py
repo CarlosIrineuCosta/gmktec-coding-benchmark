@@ -6,6 +6,7 @@ from benchmark.operational_v1.run import OUTPUT_LIMITS, output_limit
 from benchmark.operational_v1.score import score
 from benchmark.operational_v1.telemetry import TelemetrySampler, revalidate_drm_totals, summarize
 from benchmark.operational_v1.routing_probe import evaluate as evaluate_routing_probe
+from benchmark.operational_v1.qualification_gate import parse_adapter_action, tool_result
 
 
 def test_prompts_are_synthetic_and_tool_free():
@@ -116,3 +117,9 @@ def test_routing_probe_accepts_a_standard_no_prefix_diff():
 +    return normalized_status in {\"timeout\", \"rate_limited\"} and attempts < 3
 """
     assert evaluate_routing_probe(answer)["accepted"] is True
+
+
+def test_qualification_gate_parses_native_and_structured_tool_actions():
+    native = {"choices": [{"message": {"tool_calls": [{"function": {"name": "read_fixture", "arguments": '{"path":"canary.txt"}'}}]}}]}
+    assert tool_result(native, "native_openai")["bounded_action_succeeded"] is True
+    assert parse_adapter_action('<tool_call>{"name":"read_fixture","arguments":{"path":"canary.txt"}}</tool_call>') == {"name": "read_fixture", "arguments": {"path": "canary.txt"}}

@@ -44,6 +44,7 @@ function watch(page: Page): Diagnostics {
     badStatuses: [],
     externalRequests: [],
   };
+  const ownHost = new URL(url).host;
   page.on("console", (message) => {
     if (message.type() === "error") {
       diag.consoleErrors.push(`error: ${message.text()}`);
@@ -59,7 +60,6 @@ function watch(page: Page): Diagnostics {
     const status = response.status();
     if (status >= 400) diag.badStatuses.push(`${status} ${response.url()}`);
     const host = new URL(response.url()).host;
-    const ownHost = new URL(page.url() || url).host;
     if (host !== ownHost) diag.externalRequests.push(response.url());
   });
   return diag;

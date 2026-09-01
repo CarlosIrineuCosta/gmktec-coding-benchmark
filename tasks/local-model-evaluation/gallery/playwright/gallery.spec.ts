@@ -6,9 +6,10 @@ const mobile = { width: 390, height: 844 };
 test("gallery is observable and keyboard-accessible", async ({ page }) => {
   await page.setViewportSize(desktop);
   await page.goto(process.env.GALLERY_URL!);
-  await expect(page.locator("img")).toHaveCount(12);
-  await expect(page.locator("img").first()).toHaveAttribute("alt", /.+/);
-  await page.locator("img").first().click();
+  const galleryImages = page.locator(".tile__image");
+  await expect(galleryImages).toHaveCount(12);
+  await expect(galleryImages.first()).toHaveAttribute("alt", /.+/);
+  await galleryImages.first().click();
   await expect(page.getByRole("dialog")).toBeVisible();
   await page.keyboard.press("ArrowRight");
   await page.keyboard.press("Escape");

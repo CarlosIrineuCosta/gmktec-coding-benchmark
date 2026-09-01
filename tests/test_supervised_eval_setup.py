@@ -17,6 +17,7 @@ from benchmark.supervised_eval.lifecycle import DisposableServer, reserve_loopba
 from benchmark.supervised_eval.pilot import selected_pilot_models
 from benchmark.supervised_eval.private_fixture import validate_private_code_review_fixture
 from benchmark.supervised_eval.report import render
+from benchmark.supervised_eval.review_score import score_finding_ledger
 from benchmark.supervised_eval.session import OpenAICompatibleSession
 from benchmark.supervised_eval.supervision import LoopDetector
 from benchmark.supervised_eval.harness import TOOL_DEFINITIONS
@@ -161,6 +162,17 @@ class SupervisedEvaluationSetupTests(unittest.TestCase):
             plan = materialize(sources, Path(tmp) / "images", fetch=False)
         self.assertEqual(len(plan), 12)
         self.assertTrue(all(item["license"] == "public-domain" for item in plan))
+
+    def test_finding_level_review_score_has_consistent_precision_and_non_gold_count(self) -> None:
+        result = score_finding_ledger({
+            "reported_finding_ids": ["f1", "f2", "f3", "f4", "f5"],
+            "gold_defect_ids": ["g1", "g2", "g3"],
+            "matches": {"f1": "g1", "f2": "g2", "f3": "g3"},
+        })
+        self.assertEqual(result["scoring_unit"], "finding")
+        self.assertEqual(result["false_or_non_gold_findings"], 2)
+        self.assertEqual(result["recall"], 1.0)
+        self.assertEqual(result["precision"], 0.6)
 
 
 if __name__ == "__main__":
