@@ -1,0 +1,17 @@
+{
+  "campaign_id": "full-local-coding-campaign-20260901",
+  "run_date": "2026-09-01",
+  "cells": {"terminal": 18, "active": 0, "pending": 0},
+  "privacy": "Raw trajectories, private fixtures, gold data, screenshots, and local paths are excluded.",
+  "result_summary": [
+    {"candidate": "qwen38-27b-q6", "review": "accepted: 3/3 credited", "gallery": "accepted"},
+    {"candidate": "qwen38-flash-next-q3", "review": "accepted: 2/3 credited", "gallery": "accepted"},
+    {"candidate": "qwen35-9b-q6", "review": "accepted: 2/3 credited", "gallery": "accepted_with_defects"},
+    {"candidate": "nemotron3-nano-4b-q8", "review": "task_not_completed", "gallery": "task_not_completed"},
+    {"candidate": "gemma4-31b-q6", "review": "accepted: 2/3 credited", "gallery": "task_not_completed"},
+    {"candidate": "nemotron35-lightning-q8", "review": "accepted: 2/3 credited", "gallery": "task_not_completed"},
+    {"candidate": "nemotron-super-v1-q6", "review": "task_not_completed", "gallery": "task_not_completed"},
+    {"candidate": "nemotron-super-v15-q6", "review": "task_not_completed", "gallery": "task_not_completed"},
+    {"candidate": "asearcher-web-qwq-q5", "review": "accepted: 0/3 credited", "gallery": "task_not_completed"}
+  ]
+}
