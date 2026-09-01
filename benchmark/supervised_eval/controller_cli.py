@@ -29,6 +29,8 @@ def main() -> int:
     create.add_argument("--message-file", required=True, type=Path)
     create.add_argument("--request-options", type=_json, default={})
     create.add_argument("--tool-environment", type=_json, default={})
+    create.add_argument("--tool-contract", choices=["native_openai_function_tools", "structured_adapter"], default="native_openai_function_tools")
+    create.add_argument("--structured-call-format", choices=["json", "nemotron_pythonic"])
     checkpoint = commands.add_parser("checkpoint")
     checkpoint.add_argument("--decision", required=True)
     checkpoint.add_argument("--basis", required=True)
@@ -49,6 +51,7 @@ def main() -> int:
             model=args.model, workspace=args.workspace,
             initial_message=args.message_file.read_text(encoding="utf-8"),
             request_options=args.request_options, tool_environment=args.tool_environment,
+            tool_contract=args.tool_contract, structured_call_format=args.structured_call_format,
         )
         print(json.dumps({"created": controller.state_path.as_posix()}))
         return 0

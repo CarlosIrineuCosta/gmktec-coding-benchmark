@@ -1,7 +1,9 @@
 """One-turn OpenAI-compatible tool exchange with full private trajectory logging."""
 from __future__ import annotations
 
+import ast
 import json
+import re
 import time
 import urllib.request
 from typing import Any, Callable
@@ -11,6 +13,45 @@ from .harness import WorkspaceTools, tool_result_for_log
 
 
 Post = Callable[[dict[str, Any]], dict[str, Any]]
+
+
+def parse_structured_tool_call(content: str) -> dict[str, Any] | None:
+    """Parse exactly one explicitly tagged JSON or Pythonic tool action.
+
+    Some qualified local models do not emit OpenAI ``tool_calls``.  Their
+    model-card adapters instead place one action inside ``<TOOLCALL>``.  This
+    parser is deliberately narrow: it never evaluates model text and accepts
+    only a single named call with literal keyword arguments.
+    """
+    match = re.search(r"<tool_?call>\s*(.*?)\s*</tool_?call>", content, flags=re.DOTALL | re.IGNORECASE)
+    if not match:
+        return None
+    candidate = match.group(1).strip()
+    try:
+        value = json.loads(candidate)
+    except json.JSONDecodeError:
+        try:
+            expression = ast.parse(candidate, mode="eval").body
+        except SyntaxError:
+            return None
+        if isinstance(expression, ast.List) and len(expression.elts) == 1:
+            expression = expression.elts[0]
+        if not isinstance(expression, ast.Call) or not isinstance(expression.func, ast.Name) or expression.args:
+            return None
+        arguments: dict[str, Any] = {}
+        for keyword in expression.keywords:
+            if keyword.arg is None:
+                return None
+            try:
+                arguments[keyword.arg] = ast.literal_eval(keyword.value)
+            except (ValueError, TypeError, SyntaxError):
+                return None
+        return {"name": expression.func.id, "arguments": arguments}
+    if isinstance(value, list) and len(value) == 1:
+        value = value[0]
+    if not isinstance(value, dict) or not isinstance(value.get("name"), str) or not isinstance(value.get("arguments"), dict):
+        return None
+    return {"name": value["name"], "arguments": value["arguments"]}
 
 
 class OpenAICompatibleSession:
@@ -37,10 +78,17 @@ class OpenAICompatibleSession:
         messages: list[dict[str, Any]],
         tool_definitions: list[dict[str, Any]],
         request_options: dict[str, Any] | None = None,
+        tool_contract: str = "native_openai_function_tools",
     ) -> dict[str, Any]:
-        payload = {"model": self.model, "messages": messages, "tools": tool_definitions, "tool_choice": "auto"}
+        if tool_contract not in {"native_openai_function_tools", "structured_adapter"}:
+            raise ValueError(f"unsupported tool contract: {tool_contract}")
+        payload = {"model": self.model, "messages": messages}
+        if tool_contract == "native_openai_function_tools":
+            payload.update({"tools": tool_definitions, "tool_choice": "auto"})
         if request_options:
-            forbidden = {"model", "messages", "tools", "tool_choice"}.intersection(request_options)
+            forbidden = {"model", "messages"}.intersection(request_options)
+            if tool_contract == "native_openai_function_tools":
+                forbidden |= {"tools", "tool_choice"}.intersection(request_options)
             if forbidden:
                 raise ValueError(f"request options cannot override protocol keys: {sorted(forbidden)}")
             payload.update(request_options)
@@ -53,7 +101,12 @@ class OpenAICompatibleSession:
         assistant = choices[0]["message"]
         self.evidence.event("model_turn", request=payload, response=response, elapsed_ms=elapsed_ms)
         tool_results: list[dict[str, Any]] = []
-        for call in assistant.get("tool_calls") or []:
+        calls = assistant.get("tool_calls") or []
+        if tool_contract == "structured_adapter":
+            action = parse_structured_tool_call(str(assistant.get("content") or ""))
+            calls = ([{"id": None, "function": {"name": action["name"], "arguments": json.dumps(action["arguments"])}}]
+                     if action else [])
+        for call in calls:
             function = call.get("function") or {}
             name = function.get("name")
             try:

@@ -19,7 +19,7 @@ from benchmark.supervised_eval.pilot import selected_pilot_models
 from benchmark.supervised_eval.private_fixture import validate_private_code_review_fixture
 from benchmark.supervised_eval.report import render
 from benchmark.supervised_eval.review_score import score_finding_ledger
-from benchmark.supervised_eval.session import OpenAICompatibleSession
+from benchmark.supervised_eval.session import OpenAICompatibleSession, parse_structured_tool_call
 from benchmark.supervised_eval.supervision import LoopDetector
 from benchmark.supervised_eval.harness import TOOL_DEFINITIONS
 from benchmark.supervised_eval.campaign import CAMPAIGN_ID, compact_status, initialize, record_preflight, set_cell
@@ -123,6 +123,23 @@ class SupervisedEvaluationSetupTests(unittest.TestCase):
             result = session.one_turn([{"role": "user", "content": "mock"}], TOOL_DEFINITIONS)
             self.assertEqual(result["tool_results"][0]["result"]["written"], "result.txt")
             self.assertEqual((workspace / "result.txt").read_text(), "fake")
+
+    def test_structured_adapter_parses_json_and_pythonic_actions_without_native_tools(self) -> None:
+        self.assertEqual(parse_structured_tool_call('<TOOLCALL>[{"name":"read_file","arguments":{"path":"a.txt"}}]</TOOLCALL>'), {"name": "read_file", "arguments": {"path": "a.txt"}})
+        self.assertEqual(parse_structured_tool_call('<TOOLCALL>[write_file(path="a.txt", content="ok")]</TOOLCALL>'), {"name": "write_file", "arguments": {"path": "a.txt", "content": "ok"}})
+        with tempfile.TemporaryDirectory() as tmp:
+            root, workspace = Path(tmp), Path(tmp) / "workspace"
+            workspace.mkdir()
+            store = EvidenceStore(root, "structured")
+            store.write_once("manifest.json", {"run_id": "structured"})
+            calls = []
+            def fake_post(payload: dict[str, object]) -> dict[str, object]:
+                calls.append(payload)
+                return {"choices": [{"message": {"role": "assistant", "content": '<TOOLCALL>[write_file(path="result.txt", content="done")]</TOOLCALL>'}}]}
+            session = OpenAICompatibleSession("http://fake.invalid/v1", "fake", store, WorkspaceTools(workspace), fake_post)
+            result = session.one_turn([{"role": "user", "content": "mock"}], TOOL_DEFINITIONS, tool_contract="structured_adapter")
+            self.assertNotIn("tools", calls[0])
+            self.assertEqual(result["tool_results"][0]["result"]["written"], "result.txt")
 
     def test_controller_persists_native_tool_messages_and_requires_explicit_terminal(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

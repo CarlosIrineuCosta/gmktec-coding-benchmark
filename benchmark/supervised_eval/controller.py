@@ -67,6 +67,8 @@ class PilotRunController:
         initial_message: str,
         request_options: dict[str, Any] | None = None,
         tool_environment: dict[str, str] | None = None,
+        tool_contract: str = "native_openai_function_tools",
+        structured_call_format: str | None = None,
     ) -> "PilotRunController":
         store = EvidenceStore(evidence_root, run_id)
         manifest = {**manifest, "run_id": run_id}
@@ -76,20 +78,24 @@ class PilotRunController:
             "model": model,
             "request_options": request_options or {},
             "tool_environment": tool_environment or {},
-            "tool_contract": "native_openai_function_tools",
+            "tool_contract": tool_contract,
+            "structured_call_format": structured_call_format,
         })
         store.transition(RunPhase.SERVER_STARTING, "disposable server command recorded by caller")
         store.transition(RunPhase.READY, "caller verified endpoint health")
         store.transition(RunPhase.AUTONOMOUS, "canonical task packet delivered without substantive assistance")
         state = {
-            "version": 1,
+            "version": 2,
             "created_at": utc_now(),
             "endpoint": endpoint.rstrip("/"),
             "model": model,
             "workspace": str(workspace.resolve()),
             "request_options": request_options or {},
             "tool_environment": tool_environment or {},
-            "messages": [{"role": "user", "content": initial_message}],
+            "tool_contract": tool_contract,
+            "structured_call_format": structured_call_format,
+            "messages": ([{"role": "system", "content": cls._structured_tool_instruction(structured_call_format)}, {"role": "user", "content": initial_message}]
+                         if tool_contract == "structured_adapter" else [{"role": "user", "content": initial_message}]),
             "turn_count": 0,
             "tool_call_count": 0,
             "supervision_checkpoints": 0,
@@ -97,6 +103,23 @@ class PilotRunController:
         }
         _write_json(_state_path(store), state)
         return cls(evidence_root, run_id)
+
+    @staticmethod
+    def _structured_tool_instruction(call_format: str | None) -> str:
+        if call_format == "nemotron_pythonic":
+            syntax = '<TOOLCALL>[write_file(path="path", content="text")]</TOOLCALL>'
+        elif call_format == "json":
+            syntax = '<TOOLCALL>[{"name":"write_file","arguments":{"path":"path","content":"text"}}]</TOOLCALL>'
+        else:
+            raise ValueError("structured adapter requires call format json or nemotron_pythonic")
+        return (
+            "/no_think\n"
+            "You have isolated workspace tools. To call exactly one tool, emit only one tagged action using this syntax: "
+            + syntax
+            + ". Allowed tools are read_file(path), list_files(path), search_files(query), write_file(path, content), "
+              "patch_file(path, old, new), and run_command(argv). All arguments must be JSON/Python literals. "
+              "After a tool result, continue the task. Do not use native API tool calls."
+        )
 
     def _save(self) -> None:
         _write_json(self.state_path, self.state)
@@ -132,16 +155,19 @@ class PilotRunController:
                 self.state["endpoint"], self.state["model"], self.store, tools
             )
             result = session.one_turn(
-                self.state["messages"], TOOL_DEFINITIONS, self.state["request_options"]
+                self.state["messages"], TOOL_DEFINITIONS, self.state["request_options"], self.state.get("tool_contract", "native_openai_function_tools")
             )
         assistant = result["assistant"]
         self.state["messages"].append(assistant)
         for item in result["tool_results"]:
-            self.state["messages"].append({
-                "role": "tool",
-                "tool_call_id": item.get("tool_call_id"),
-                "content": item["result_json"],
-            })
+            if self.state.get("tool_contract") == "structured_adapter":
+                self.state["messages"].append({"role": "user", "content": f"Tool result for {item['tool']}: {item['result_json']}"})
+            else:
+                self.state["messages"].append({
+                    "role": "tool",
+                    "tool_call_id": item.get("tool_call_id"),
+                    "content": item["result_json"],
+                })
         self.state["turn_count"] += 1
         self.state["tool_call_count"] += len(result["tool_results"])
         compact = TurnResult(
