@@ -122,4 +122,4 @@ def test_routing_probe_accepts_a_standard_no_prefix_diff():
 def test_qualification_gate_parses_native_and_structured_tool_actions():
     native = {"choices": [{"message": {"tool_calls": [{"function": {"name": "read_fixture", "arguments": '{"path":"canary.txt"}'}}]}}]}
     assert tool_result(native, "native_openai")["bounded_action_succeeded"] is True
-    assert parse_adapter_action('<tool_call>{"name":"read_fixture","arguments":{"path":"canary.txt"}}</tool_call>') == {"name": "read_fixture", "arguments": {"path": "canary.txt"}}
+    assert parse_adapter_action('<TOOLCALL>[{"name":"read_fixture","arguments":{"path":"canary.txt"}}]</TOOLCALL>') == {"name": "read_fixture", "arguments": {"path": "canary.txt"}}

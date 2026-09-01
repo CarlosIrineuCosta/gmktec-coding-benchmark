@@ -79,12 +79,14 @@ def json_request(endpoint: str, body: dict[str, Any], timeout: int) -> tuple[dic
 
 def parse_adapter_action(content: str) -> dict[str, Any] | None:
     """Accept one explicit JSON action, optionally inside a tool_call tag."""
-    match = re.search(r"<tool_call>\s*(\{.*?\})\s*</tool_call>", content, flags=re.DOTALL)
+    match = re.search(r"<toolcall>\s*(.*?)\s*</toolcall>", content, flags=re.DOTALL | re.IGNORECASE)
     candidate = match.group(1) if match else content.strip()
     try:
         value = json.loads(candidate)
     except json.JSONDecodeError:
         return None
+    if isinstance(value, list) and len(value) == 1:
+        value = value[0]
     if not isinstance(value, dict) or not isinstance(value.get("name"), str) or not isinstance(value.get("arguments"), dict):
         return None
     return value
@@ -183,7 +185,7 @@ def main() -> int:
                 if args.tool_mode == "native_openai":
                     tool_body = {"model": args.model, "messages": [{"role": "user", "content": "Call read_fixture exactly once with path canary.txt. Do not explain."}], "tools": native_tools, "tool_choice": "auto", "temperature": 0, "max_tokens": 256}
                 else:
-                    tool_body = {"model": args.model, "messages": [{"role": "user", "content": "Return only <tool_call>{\"name\":\"read_fixture\",\"arguments\":{\"path\":\"canary.txt\"}}</tool_call> for this bounded tool task."}], "temperature": 0, "max_tokens": 256}
+                    tool_body = {"model": args.model, "messages": [{"role": "system", "content": "/no_think"}, {"role": "user", "content": "Return only <TOOLCALL>[{\"name\":\"read_fixture\",\"arguments\":{\"path\":\"canary.txt\"}}]</TOOLCALL> for this bounded tool task."}], "temperature": 0, "max_tokens": 256}
                 tool_response, tool_metrics = json_request(endpoint, tool_body, args.timeout)
                 write_json(run_dir / "tool-response.json", tool_response)
                 parsed = tool_result(tool_response, args.tool_mode)
