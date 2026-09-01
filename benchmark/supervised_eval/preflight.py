@@ -9,6 +9,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import shutil
 import socket
 import subprocess
@@ -25,11 +26,12 @@ def now() -> str:
 
 
 def command(argv: list[str], *, cwd: Path | None = None, env: dict[str, str] | None = None) -> dict[str, Any]:
-    executable = shutil.which(argv[0], path=(env or {}).get("PATH"))
+    effective_env = {**os.environ, **(env or {})}
+    executable = shutil.which(argv[0], path=effective_env.get("PATH"))
     if executable is None:
         return {"ok": False, "reason": "unavailable", "argv": argv}
     try:
-        result = subprocess.run(argv, cwd=cwd, env=env, text=True, capture_output=True, timeout=45, check=False)
+        result = subprocess.run(argv, cwd=cwd, env=effective_env, text=True, capture_output=True, timeout=45, check=False)
     except (OSError, subprocess.TimeoutExpired) as exc:
         return {"ok": False, "reason": f"{type(exc).__name__}: {exc}", "argv": argv}
     return {
@@ -74,7 +76,7 @@ def browser_smoke(node: Path, gallery_workspace: Path) -> dict[str, Any]:
         "if(await p.locator('main').textContent()!=='phase0')throw new Error('content mismatch');await p.close();}"
         "await b.close();console.log('chromium-both-viewports-ok');})().catch(e=>{console.error(e);process.exit(1)});"
     )
-    return command([str(node), "-e", script], cwd=gallery_workspace, env={"PATH": str(node.parent)})
+    return command([str(node), "-e", script], cwd=gallery_workspace, env={"PATH": f"{node.parent}:{os.environ.get('PATH', '')}"})
 
 
 def port_free(port: int) -> bool:
@@ -97,9 +99,10 @@ def main() -> int:
     checks: dict[str, Any] = {}
     for utility in ("git", "curl", "jq", "python3"):
         checks[f"utility:{utility}"] = command([utility, "--version"])
-    checks["node"] = command([str(args.node), "--version"], env={"PATH": str(args.node.parent)})
-    checks["npm"] = command([str(args.node.parent / "npm"), "--version"], env={"PATH": str(args.node.parent)})
-    checks["npx_playwright"] = command([str(args.node.parent / "npx"), "playwright", "--version"], cwd=args.gallery_workspace, env={"PATH": str(args.node.parent)})
+    node_path = f"{args.node.parent}:{os.environ.get('PATH', '')}"
+    checks["node"] = command([str(args.node), "--version"], env={"PATH": node_path})
+    checks["npm"] = command([str(args.node.parent / "npm"), "--version"], env={"PATH": node_path})
+    checks["npx_playwright"] = command([str(args.node.parent / "npx"), "playwright", "--version"], cwd=args.gallery_workspace, env={"PATH": node_path})
     checks["chromium_both_viewports"] = browser_smoke(args.node, args.gallery_workspace)
     checks["gallery_corpus"] = gallery_check(args.gallery_manifest, args.gallery_images)
     try:
