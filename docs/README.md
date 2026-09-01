@@ -10,6 +10,10 @@ This directory is the tracked, public, readable surface of the benchmark.
 Source code remains in `benchmark/`, small public canaries in `canaries/`,
 deployment launch assets in `deploy/`, and task packets in `tasks/`.
 
+Owner-retained runnable model outputs live under `demos/working/`. Each demo
+has a provenance record that distinguishes model-generated source from later
+benchmark/operator work.
+
 Generated run trees, unredacted transcripts, hidden tests, results JSON, and
 provider/OAuth profiles are operational data, not documents. They are stored
 under the gitignored `data/private/` boundary. Sanitized material intended for

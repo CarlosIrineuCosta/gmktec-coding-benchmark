@@ -1,0 +1,122 @@
+[
+  {
+    "creator": "Katsushika Hokusai",
+    "height": 662,
+    "id": "great-wave",
+    "license": "public-domain",
+    "local_filename": "great-wave.jpg",
+    "sha256": "7a3276c40bc60c2eefb061bf81ae682b6cc82e13df70413fa0cf457b95e53649",
+    "source_page": "https://commons.wikimedia.org/wiki/File:The_Great_Wave_off_Kanagawa.jpg",
+    "width": 960
+  },
+  {
+    "creator": "Vincent van Gogh",
+    "height": 742,
+    "id": "starry-night",
+    "license": "public-domain",
+    "local_filename": "starry-night.jpg",
+    "sha256": "e564aed3c0a51a478c8745e0ce97e8e0fbb75a89462e89d7f7c0e1a676093d77",
+    "source_page": "https://commons.wikimedia.org/wiki/File:Vincent_van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg",
+    "width": 960
+  },
+  {
+    "creator": "Leonardo da Vinci",
+    "height": 1431,
+    "id": "mona-lisa",
+    "license": "public-domain",
+    "local_filename": "mona-lisa.jpg",
+    "sha256": "5f223c31ba0a477eb7cbe5e5f959d822cbfc46081b19b96498cbd5601d9ac81d",
+    "source_page": "https://commons.wikimedia.org/wiki/File:Mona_Lisa,_by_Leonardo_da_Vinci,_from_C2RMF_retouched.jpg",
+    "width": 960
+  },
+  {
+    "creator": "Johannes Vermeer",
+    "height": 1135,
+    "id": "pearl-earring",
+    "license": "public-domain",
+    "local_filename": "pearl-earring.jpg",
+    "sha256": "a73dbbea841366b256db645cb7563dfd5d27d0f2791cb7f1acf46cdc71b67260",
+    "source_page": "https://commons.wikimedia.org/wiki/File:Girl_with_a_Pearl_Earring.jpg",
+    "width": 960
+  },
+  {
+    "creator": "Caspar David Friedrich",
+    "height": 1229,
+    "id": "wanderer",
+    "license": "public-domain",
+    "local_filename": "wanderer.jpg",
+    "sha256": "be2051680a8f875d185dac209488326a677621c93a1a0b978df2c3cbf41b1dcd",
+    "source_page": "https://commons.wikimedia.org/wiki/File:Caspar_David_Friedrich_-_Wanderer_above_the_sea_of_fog.jpg",
+    "width": 960
+  },
+  {
+    "creator": "Eugene Delacroix",
+    "height": 760,
+    "id": "liberty",
+    "license": "public-domain",
+    "local_filename": "liberty.jpg",
+    "sha256": "b0d923830722412e2a5fe256321bc8a5c578a929d1b6b09f07ab6613b0bc0089",
+    "source_page": "https://commons.wikimedia.org/wiki/File:Eug%C3%A8ne_Delacroix_-_La_libert%C3%A9_guidant_le_peuple.jpg",
+    "width": 960
+  },
+  {
+    "creator": "John Constable",
+    "height": 662,
+    "id": "hay-wain",
+    "license": "public-domain",
+    "local_filename": "hay-wain.jpg",
+    "sha256": "2fd3411b38f80c7a33a572ebd6d924717fe86bb7d3c652e604dd831694942728",
+    "source_page": "https://commons.wikimedia.org/wiki/File:John_Constable_-_The_Hay_Wain_(1821).jpg",
+    "width": 960
+  },
+  {
+    "creator": "J. M. W. Turner",
+    "height": 713,
+    "id": "temeraire",
+    "license": "public-domain",
+    "local_filename": "temeraire.jpg",
+    "sha256": "bf086acebed66724804b09ac611e19bc0830e0acfc04617671ae875a8130ae28",
+    "source_page": "https://commons.wikimedia.org/wiki/File:The_Fighting_Temeraire,_JMW_Turner,_National_Gallery.jpg",
+    "width": 960
+  },
+  {
+    "creator": "John William Waterhouse",
+    "height": 737,
+    "id": "lady-shalott",
+    "license": "public-domain",
+    "local_filename": "lady-shalott.jpg",
+    "sha256": "2ea8b5122c49eec00b6d2c7254a7c8830d280737f36ba280d0c69b8cf2b0fb2f",
+    "source_page": "https://commons.wikimedia.org/wiki/File:John_William_Waterhouse_-_The_Lady_of_Shalott_-_Google_Art_Project.jpg",
+    "width": 960
+  },
+  {
+    "creator": "Georges Seurat",
+    "height": 639,
+    "id": "grande-jatte",
+    "license": "public-domain",
+    "local_filename": "grande-jatte.jpg",
+    "sha256": "9bdc5f33058e36327877f3e776037c94f19e42bb542945da780a460f80ab2954",
+    "source_page": "https://commons.wikimedia.org/wiki/File:A_Sunday_on_La_Grande_Jatte,_Georges_Seurat,_1884.jpg",
+    "width": 960
+  },
+  {
+    "creator": "Sandro Botticelli",
+    "height": 603,
+    "id": "birth-venus",
+    "license": "public-domain",
+    "local_filename": "birth-venus.jpg",
+    "sha256": "f25c0bf274bbdb806ed22b3ff7f8da88048bfa6eeb1d92bbc4566ee5b3fdc176",
+    "source_page": "https://commons.wikimedia.org/wiki/File:Sandro_Botticelli_-_La_nascita_di_Venere_-_Google_Art_Project_-_edited.jpg",
+    "width": 960
+  },
+  {
+    "creator": "Hieronymus Bosch",
+    "height": 546,
+    "id": "garden-delights",
+    "license": "public-domain",
+    "local_filename": "garden-delights.jpg",
+    "sha256": "efc040f8549b9a78510af8d222f93504ca54e0e212637b9bc040eca73fdf6f2f",
+    "source_page": "https://commons.wikimedia.org/wiki/File:The_Garden_of_Earthly_Delights_by_Bosch_High_Resolution.jpg",
+    "width": 960
+  }
+]

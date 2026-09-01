@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="A responsive, keyboard-accessible gallery of twelve public-domain paintings served from a local corpus."
+    />
+    <meta name="color-scheme" content="dark light" />
+    <title>Public Domain Paintings — Photo Gallery</title>
+  </head>
+  <body>
+    <a class="skip-link" href="#gallery">Skip to gallery</a>
+
+    <div id="app">
+      <header class="masthead">
+        <p class="masthead__eyebrow">Local corpus &middot; CC0 / public domain</p>
+        <h1 class="masthead__title">Public Domain Paintings</h1>
+        <p class="masthead__lede">
+          Twelve reproductions from the local image corpus. Select any artwork to
+          open it larger with its caption and provenance metadata; use
+          <kbd>&larr;</kbd> / <kbd>&rarr;</kbd> to step through the collection and
+          <kbd>Esc</kbd> to close.
+        </p>
+      </header>
+
+      <main class="shell">
+        <section class="gallery-region" aria-labelledby="gallery-heading">
+          <div class="gallery-region__bar">
+            <h2 class="gallery-region__heading" id="gallery-heading">Collection</h2>
+            <p class="gallery-region__count" id="gallery-count" aria-live="polite"></p>
+          </div>
+          <div id="gallery" class="gallery-slot">
+            <p class="notice">Loading the collection&hellip;</p>
+          </div>
+        </section>
+      </main>
+
+      <footer class="colophon">
+        <p>
+          Images and their metadata come from <code>public/images.json</code>;
+          credit lines link back to each source page.
+        </p>
+      </footer>
+    </div>
+
+    <noscript>
+      <p class="notice notice--standalone">
+        This gallery renders from its manifest in the browser, so JavaScript is
+        required to view the collection.
+      </p>
+    </noscript>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
