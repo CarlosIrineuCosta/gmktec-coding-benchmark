@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import ast
 import json
 import re
 import signal
@@ -78,12 +79,29 @@ def json_request(endpoint: str, body: dict[str, Any], timeout: int) -> tuple[dic
 
 
 def parse_adapter_action(content: str) -> dict[str, Any] | None:
-    """Accept one explicit JSON action, optionally inside a tool_call tag."""
-    match = re.search(r"<toolcall>\s*(.*?)\s*</toolcall>", content, flags=re.DOTALL | re.IGNORECASE)
+    """Accept one explicit JSON, Python-style, or XML action inside a tool-call tag."""
+    match = re.search(r"<tool_?call>\s*(.*?)\s*</tool_?call>", content, flags=re.DOTALL | re.IGNORECASE)
     candidate = match.group(1) if match else content.strip()
     try:
         value = json.loads(candidate)
     except json.JSONDecodeError:
+        try:
+            expression = ast.parse(candidate, mode="eval").body
+        except SyntaxError:
+            expression = None
+        if isinstance(expression, ast.List) and len(expression.elts) == 1:
+            expression = expression.elts[0]
+        if isinstance(expression, ast.Call) and isinstance(expression.func, ast.Name) and not expression.args and len(expression.keywords) == 1:
+            keyword = expression.keywords[0]
+            if keyword.arg == "path" and isinstance(keyword.value, ast.Constant) and isinstance(keyword.value.value, str):
+                return {"name": expression.func.id, "arguments": {"path": keyword.value.value}}
+        xml = re.fullmatch(
+            r"\s*<function=([A-Za-z_][A-Za-z0-9_]*)>\s*<parameter=path>\s*(.*?)\s*</parameter>\s*</function>\s*",
+            candidate,
+            flags=re.DOTALL | re.IGNORECASE,
+        )
+        if xml:
+            return {"name": xml.group(1), "arguments": {"path": xml.group(2).strip()}}
         return None
     if isinstance(value, list) and len(value) == 1:
         value = value[0]
@@ -105,6 +123,8 @@ def tool_result(response: dict[str, Any], mode: str) -> dict[str, Any]:
                 arguments = None
             if isinstance(arguments, dict):
                 action = {"name": function.get("name"), "arguments": arguments}
+        if action is None:
+            action = parse_adapter_action(str(message.get("content") or ""))
     else:
         action = parse_adapter_action(str(message.get("content") or ""))
     valid = bool(action and action.get("name") == "read_fixture" and action.get("arguments", {}).get("path") == "canary.txt")
@@ -142,6 +162,7 @@ def main() -> int:
     parser.add_argument("--reasoning", choices=("on", "off", "auto"), default="auto")
     parser.add_argument("--reasoning-effort", default="default")
     parser.add_argument("--tool-mode", choices=("native_openai", "structured_adapter"), required=True)
+    parser.add_argument("--structured-call-format", choices=("json", "nemotron_pythonic"), default="json")
     parser.add_argument("--tool-format-note", required=True)
     parser.add_argument("--timeout", type=int, default=900)
     args = parser.parse_args()
@@ -160,7 +181,8 @@ def main() -> int:
         "schema_version": 1, "started_at": utcnow(), "model": args.model, "revision": args.revision,
         "quantization": args.quantization, "artifact_path": str(args.model_path), "artifact_sha256": args.artifact_sha256,
         "endpoint": endpoint, "context": args.context, "reasoning": args.reasoning,
-        "reasoning_effort": args.reasoning_effort, "tool_mode": args.tool_mode, "tool_format_note": args.tool_format_note,
+        "reasoning_effort": args.reasoning_effort, "tool_mode": args.tool_mode,
+        "structured_call_format": args.structured_call_format, "tool_format_note": args.tool_format_note,
         "server_command": command,
     })
     server_log = run_dir / "server.log"
@@ -185,7 +207,12 @@ def main() -> int:
                 if args.tool_mode == "native_openai":
                     tool_body = {"model": args.model, "messages": [{"role": "user", "content": "Call read_fixture exactly once with path canary.txt. Do not explain."}], "tools": native_tools, "tool_choice": "auto", "temperature": 0, "max_tokens": 256}
                 else:
-                    tool_body = {"model": args.model, "messages": [{"role": "system", "content": "/no_think"}, {"role": "user", "content": "Return only <TOOLCALL>[{\"name\":\"read_fixture\",\"arguments\":{\"path\":\"canary.txt\"}}]</TOOLCALL> for this bounded tool task."}], "temperature": 0, "max_tokens": 256}
+                    structured_call = (
+                        '<TOOLCALL>[read_fixture(path="canary.txt")]</TOOLCALL>'
+                        if args.structured_call_format == "nemotron_pythonic"
+                        else '<TOOLCALL>[{"name":"read_fixture","arguments":{"path":"canary.txt"}}]</TOOLCALL>'
+                    )
+                    tool_body = {"model": args.model, "messages": [{"role": "system", "content": "/no_think"}, {"role": "user", "content": f"Return only {structured_call} for this bounded tool task."}], "temperature": 0, "max_tokens": 256}
                 tool_response, tool_metrics = json_request(endpoint, tool_body, args.timeout)
                 write_json(run_dir / "tool-response.json", tool_response)
                 parsed = tool_result(tool_response, args.tool_mode)

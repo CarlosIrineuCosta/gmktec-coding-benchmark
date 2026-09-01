@@ -117,7 +117,14 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         "stage": "routing_probe_2026_09_01",
         "started_at": utcnow(),
         "model": {"identifier": args.model, "revision": args.revision, "quantization": args.quantization, "model_sha256": args.model_sha256},
-        "backend": {"endpoint": args.endpoint, "version": args.backend_version, "context": args.context, "reasoning": "on", "reasoning_effort": "xhigh", "reasoning_preserve": True},
+        "backend": {
+            "endpoint": args.endpoint,
+            "version": args.backend_version,
+            "context": args.context,
+            "reasoning": args.reasoning,
+            "reasoning_effort": args.reasoning_effort,
+            "reasoning_preserve": args.reasoning_preserve,
+        },
         "request": {"temperature": 1.0, "top_p": 0.95, "top_k": 20, "min_p": 0, "max_tokens": 4096, "prompt_sha256": hashlib.sha256(prompt.encode()).hexdigest()},
         "server_lifecycle_telemetry": args.server_lifecycle_telemetry,
         "status": "serving_failure",
@@ -151,6 +158,9 @@ def main() -> None:
     parser.add_argument("--endpoint", required=True)
     parser.add_argument("--backend-version", required=True)
     parser.add_argument("--context", type=int, default=65536)
+    parser.add_argument("--reasoning", choices=("on", "off", "auto"), default="auto")
+    parser.add_argument("--reasoning-effort", default="default")
+    parser.add_argument("--reasoning-preserve", action="store_true")
     parser.add_argument("--timeout", type=int, default=1200)
     parser.add_argument("--server-pid", type=int, required=True)
     parser.add_argument("--telemetry-interval", type=float, default=1.0)
