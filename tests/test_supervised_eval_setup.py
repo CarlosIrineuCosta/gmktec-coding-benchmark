@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -185,6 +186,12 @@ class SupervisedEvaluationSetupTests(unittest.TestCase):
         self.assertEqual(result["credited_findings"], 0)
         self.assertEqual(result["recall"], 0.0)
         self.assertIsNone(result["precision"])
+
+    def test_timed_out_command_kills_background_child_group(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            tools = WorkspaceTools(Path(tmp), command_timeout_seconds=0.05)
+            with self.assertRaises(subprocess.TimeoutExpired):
+                tools.call("run_command", {"argv": ["sh", "-c", "sleep 30 & wait"]})
 
     def test_campaign_state_requires_nine_candidates_and_preserves_terminal_cells(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

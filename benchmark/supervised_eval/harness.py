@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import os
+import signal
 import subprocess
 from pathlib import Path
 from typing import Any
@@ -92,16 +93,27 @@ class WorkspaceTools:
             argv = arguments["argv"]
             if not isinstance(argv, list) or not argv or not all(isinstance(item, str) for item in argv):
                 raise ValueError("argv must be a non-empty string array")
-            completed = subprocess.run(
+            process = subprocess.Popen(
                 argv,
                 cwd=self.workspace,
                 text=True,
-                capture_output=True,
-                timeout=self.command_timeout_seconds,
-                check=False,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
                 env={**os.environ, **self.environment},
+                start_new_session=True,
             )
-            return {"exit_code": completed.returncode, "stdout": completed.stdout[-30000:], "stderr": completed.stderr[-30000:]}
+            try:
+                stdout, stderr = process.communicate(timeout=self.command_timeout_seconds)
+            except subprocess.TimeoutExpired:
+                # Candidate commands can background a child such as a preview
+                # server.  Killing only the shell leaves that child holding the
+                # output pipe and makes communicate() wait forever.  Each tool
+                # command owns a new process group, so terminate that bounded
+                # group before collecting the diagnostic.
+                os.killpg(process.pid, signal.SIGKILL)
+                stdout, stderr = process.communicate()
+                raise subprocess.TimeoutExpired(argv, self.command_timeout_seconds, output=stdout, stderr=stderr)
+            return {"exit_code": process.returncode, "stdout": stdout[-30000:], "stderr": stderr[-30000:]}
         raise ValueError(f"tool is not allowed: {name}")
 
 
