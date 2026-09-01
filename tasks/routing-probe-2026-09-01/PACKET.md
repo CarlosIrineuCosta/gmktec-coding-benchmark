@@ -8,5 +8,5 @@ only when the normalized status is `timeout` or `rate_limited` and fewer than
 three attempts have already occurred. Return only a standard unified diff that
 changes `retry.py`. Do not use tools, external information, or unstated facts.
 
-The supplied `test_retry.py` is the deterministic acceptance test. It is not
+The supplied `test_retry.py` is a standard-library `unittest` acceptance test. It is not
 shown to the candidate as an editable target and must not be modified.

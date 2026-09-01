@@ -95,7 +95,7 @@ def evaluate(answer: str) -> dict[str, Any]:
         if patch_text.startswith("```diff") and patch_text.endswith("```"):
             patch_text = "\n".join(patch_text.splitlines()[1:-1]).strip()
         patch = subprocess.run(["patch", "-p1", "--batch"], cwd=root, input=patch_text + "\n", text=True, capture_output=True, timeout=30)
-        test = subprocess.run(["python3", "-m", "pytest", "-q"], cwd=root, text=True, capture_output=True, timeout=60) if patch.returncode == 0 else None
+        test = subprocess.run(["python3", "-m", "unittest", "-v"], cwd=root, text=True, capture_output=True, timeout=60) if patch.returncode == 0 else None
         return {
             "patch_exit_code": patch.returncode,
             "patch_output": (patch.stdout + patch.stderr)[-4000:],
