@@ -86,3 +86,15 @@ def test_routing_probe_applies_and_accepts_the_required_patch():
 +    return status.strip().lower() in {\"timeout\", \"rate_limited\"} and attempts < 3
 """
     assert evaluate_routing_probe(answer)["accepted"] is True
+
+
+def test_routing_probe_accepts_a_standard_no_prefix_diff():
+    answer = """--- retry.py
++++ retry.py
+@@ -1,2 +1,3 @@
+ def should_retry(status: str, attempts: int) -> bool:
+-    return status in {\"timeout\", \"rate_limited\"} and attempts <= 3
++    normalized_status = status.strip().lower()
++    return normalized_status in {\"timeout\", \"rate_limited\"} and attempts < 3
+"""
+    assert evaluate_routing_probe(answer)["accepted"] is True

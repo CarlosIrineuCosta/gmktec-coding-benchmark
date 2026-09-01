@@ -94,10 +94,12 @@ def evaluate(answer: str) -> dict[str, Any]:
         patch_text = answer.strip()
         if patch_text.startswith("```diff") and patch_text.endswith("```"):
             patch_text = "\n".join(patch_text.splitlines()[1:-1]).strip()
-        patch = subprocess.run(["patch", "-p1", "--batch"], cwd=root, input=patch_text + "\n", text=True, capture_output=True, timeout=30)
+        strip = 1 if patch_text.startswith("--- a/") or patch_text.startswith("diff --git a/") else 0
+        patch = subprocess.run(["patch", f"-p{strip}", "--batch"], cwd=root, input=patch_text + "\n", text=True, capture_output=True, timeout=30)
         test = subprocess.run(["python3", "-m", "unittest", "-v"], cwd=root, text=True, capture_output=True, timeout=60) if patch.returncode == 0 else None
         return {
             "patch_exit_code": patch.returncode,
+            "patch_strip_level": strip,
             "patch_output": (patch.stdout + patch.stderr)[-4000:],
             "test_exit_code": test.returncode if test else None,
             "test_output": (test.stdout + test.stderr)[-4000:] if test else "",
