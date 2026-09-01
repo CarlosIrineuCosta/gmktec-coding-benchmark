@@ -21,6 +21,7 @@ from benchmark.supervised_eval.review_score import score_finding_ledger
 from benchmark.supervised_eval.session import OpenAICompatibleSession
 from benchmark.supervised_eval.supervision import LoopDetector
 from benchmark.supervised_eval.harness import TOOL_DEFINITIONS
+from benchmark.supervised_eval.campaign import CAMPAIGN_ID, compact_status, initialize, record_preflight, set_cell
 
 
 class SupervisedEvaluationSetupTests(unittest.TestCase):
@@ -173,6 +174,22 @@ class SupervisedEvaluationSetupTests(unittest.TestCase):
         self.assertEqual(result["false_or_non_gold_findings"], 2)
         self.assertEqual(result["recall"], 1.0)
         self.assertEqual(result["precision"], 0.6)
+
+    def test_campaign_state_requires_nine_candidates_and_preserves_terminal_cells(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "campaign"
+            candidates = [f"candidate-{index}" for index in range(9)]
+            initialize(root, candidates)
+            preflight = {"campaign_id": CAMPAIGN_ID, "status": "passed", "checks": {"browser": "passed"}}
+            path = root / "preflight-input.json"
+            path.write_text(json.dumps(preflight), encoding="utf-8")
+            record_preflight(root, preflight)
+            cell_id = "candidate-0-code_review"
+            set_cell(root, cell_id, "active", run_id="candidate-0-review")
+            set_cell(root, cell_id, "terminal", reason="accepted")
+            self.assertEqual(compact_status(root)["counts"], {"pending": 17, "active": 0, "terminal": 1})
+            with self.assertRaises(RuntimeError):
+                set_cell(root, cell_id, "active")
 
 
 if __name__ == "__main__":
