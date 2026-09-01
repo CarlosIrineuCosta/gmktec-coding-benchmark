@@ -57,6 +57,17 @@ def _read_counter(path: Path) -> int | None:
         return None
 
 
+def _drm_totals(entries: list[dict[str, Any]]) -> tuple[int | None, int | None]:
+    """Sum DRM accounting once per client, not once per duplicated file descriptor."""
+    unique: dict[tuple[str | None, str], dict[str, Any]] = {}
+    for entry in entries:
+        client = entry.get("client_id") or f"fd:{entry.get('fd')}"
+        unique.setdefault((entry.get("driver"), str(client)), entry)
+    vram = [entry.get("vram_bytes") for entry in unique.values() if isinstance(entry.get("vram_bytes"), int)]
+    gtt = [entry.get("gtt_bytes") for entry in unique.values() if isinstance(entry.get("gtt_bytes"), int)]
+    return (sum(vram) if vram else None, sum(gtt) if gtt else None)
+
+
 def _drm_process_memory(pid: int | None) -> dict[str, Any]:
     """Read DRM's per-file-descriptor accounting for a process, if exposed."""
     if pid is None:
@@ -92,15 +103,34 @@ def _drm_process_memory(pid: int | None) -> dict[str, Any]:
                 "gtt_bytes": counter("drm-memory-gtt"),
             }
         )
-    vram_values = [entry["vram_bytes"] for entry in entries if entry["vram_bytes"] is not None]
-    gtt_values = [entry["gtt_bytes"] for entry in entries if entry["gtt_bytes"] is not None]
+    vram_bytes, gtt_bytes = _drm_totals(entries)
     return {
-        "status": "available" if vram_values or gtt_values else "unavailable",
-        "reason": None if vram_values or gtt_values else "DRM fdinfo did not expose VRAM/GTT counters for llama-server",
-        "vram_bytes": sum(vram_values) if vram_values else None,
-        "gtt_bytes": sum(gtt_values) if gtt_values else None,
+        "status": "available" if vram_bytes is not None or gtt_bytes is not None else "unavailable",
+        "reason": None if vram_bytes is not None or gtt_bytes is not None else "DRM fdinfo did not expose VRAM/GTT counters for llama-server",
+        "vram_bytes": vram_bytes,
+        "gtt_bytes": gtt_bytes,
         "entries": entries,
     }
+
+
+def revalidate_drm_totals(payload: dict[str, Any]) -> dict[str, Any]:
+    """Recalculate an older telemetry payload that summed duplicate DRM FDs."""
+    corrected = json.loads(json.dumps(payload))
+    for sample in corrected.get("samples", []):
+        process_memory = sample.get("amd_gpu", {}).get("process_memory", {})
+        if process_memory.get("entries"):
+            vram_bytes, gtt_bytes = _drm_totals(process_memory["entries"])
+            process_memory["vram_bytes"] = vram_bytes
+            process_memory["gtt_bytes"] = gtt_bytes
+            process_memory["status"] = "available" if vram_bytes is not None or gtt_bytes is not None else "unavailable"
+    counter_paths = corrected.get("summary", {}).get("amd_gpu", {}).get("counter_paths", [])
+    corrected["summary"] = summarize(corrected.get("samples", []), [])
+    corrected["summary"]["amd_gpu"]["counter_paths"] = counter_paths
+    corrected["revalidated"] = {
+        "reason": "Deduplicated repeated DRM fdinfo entries by driver and client_id.",
+        "collector_correction": "per-client DRM memory accounting",
+    }
+    return corrected
 
 
 def discover_amdgpu_counters() -> list[dict[str, Path]]:
@@ -225,11 +255,20 @@ class TelemetrySampler:
 def main() -> None:
     """Run a server-lifecycle collector from a disposable launcher script."""
     parser = argparse.ArgumentParser()
-    parser.add_argument("--server-pid", type=int, required=True)
-    parser.add_argument("--output", type=Path, required=True)
-    parser.add_argument("--stop-file", type=Path, required=True)
+    parser.add_argument("--server-pid", type=int)
+    parser.add_argument("--output", type=Path)
+    parser.add_argument("--stop-file", type=Path)
     parser.add_argument("--interval", type=float, default=1.0)
+    parser.add_argument("--revalidate-input", type=Path)
+    parser.add_argument("--revalidate-output", type=Path)
     args = parser.parse_args()
+    if args.revalidate_input or args.revalidate_output:
+        if not args.revalidate_input or not args.revalidate_output:
+            parser.error("--revalidate-input and --revalidate-output must be used together")
+        args.revalidate_output.write_text(json.dumps(revalidate_drm_totals(json.loads(args.revalidate_input.read_text(encoding="utf-8"))), indent=2) + "\n", encoding="utf-8")
+        return
+    if args.server_pid is None or args.output is None or args.stop_file is None:
+        parser.error("--server-pid, --output, and --stop-file are required for lifecycle collection")
     sampler = TelemetrySampler(args.server_pid, args.interval)
     sampler.start()
     try:

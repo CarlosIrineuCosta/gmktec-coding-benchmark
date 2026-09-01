@@ -4,7 +4,7 @@ from benchmark.operational_v1.prompts import prompt
 from benchmark.operational_v1.patch_eval import evaluate
 from benchmark.operational_v1.run import OUTPUT_LIMITS, output_limit
 from benchmark.operational_v1.score import score
-from benchmark.operational_v1.telemetry import TelemetrySampler, summarize
+from benchmark.operational_v1.telemetry import TelemetrySampler, revalidate_drm_totals, summarize
 from benchmark.operational_v1.routing_probe import evaluate as evaluate_routing_probe
 
 
@@ -75,6 +75,24 @@ def test_telemetry_write_creates_nested_evidence_directory(tmp_path):
     output = tmp_path / "nested" / "telemetry.json"
     sampler.write(output, summary)
     assert output.exists()
+
+
+def test_telemetry_revalidation_deduplicates_drm_client_ids():
+    payload = {
+        "summary": {"amd_gpu": {"counter_paths": [{"card": "card0"}]}},
+        "samples": [{
+            "system_memory_kib": {"MemAvailable": 10, "MemUsed": 90},
+            "llama_server": {"rss_kib": 12},
+            "amd_gpu": {"status": "available", "process_memory": {"entries": [
+                {"fd": "4", "driver": "amdgpu", "client_id": "9", "vram_bytes": 100, "gtt_bytes": 200},
+                {"fd": "5", "driver": "amdgpu", "client_id": "9", "vram_bytes": 100, "gtt_bytes": 200},
+            ]}},
+        }],
+    }
+    corrected = revalidate_drm_totals(payload)
+    memory = corrected["samples"][0]["amd_gpu"]["process_memory"]
+    assert memory["vram_bytes"] == 100 and memory["gtt_bytes"] == 200
+    assert corrected["summary"]["amd_gpu"]["peak_llama_server_gtt_bytes"] == 200
 
 
 def test_routing_probe_applies_and_accepts_the_required_patch():
