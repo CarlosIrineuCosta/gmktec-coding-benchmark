@@ -16,8 +16,8 @@ def score_finding_ledger(ledger: dict[str, Any]) -> dict[str, Any]:
     findings = ledger.get("reported_finding_ids")
     gold = ledger.get("gold_defect_ids")
     matches = ledger.get("matches")
-    if not isinstance(findings, list) or not findings or not all(isinstance(item, str) and item for item in findings):
-        raise ValueError("reported_finding_ids must be a non-empty list of strings")
+    if not isinstance(findings, list) or not all(isinstance(item, str) and item for item in findings):
+        raise ValueError("reported_finding_ids must be a list of non-empty strings")
     if len(set(findings)) != len(findings):
         raise ValueError("reported_finding_ids must be unique")
     if not isinstance(gold, list) or not gold or not all(isinstance(item, str) and item for item in gold):
@@ -43,7 +43,7 @@ def score_finding_ledger(ledger: dict[str, Any]) -> dict[str, Any]:
         "gold_defects": len(gold),
         "matched_gold_defects": credited,
         "recall": credited / len(gold),
-        "precision": credited / total,
+        "precision": credited / total if total else None,
     }
 
 

@@ -15,6 +15,7 @@ class RunPhase(StrEnum):
 
 class TerminalClass(StrEnum):
     ACCEPTED = "accepted"
+    TASK_NOT_COMPLETED = "task_not_completed"
     MODEL_UNRECOVERABLE = "model_unrecoverable"
     MODEL_DESTRUCTIVE = "model_destructive"
     INFRASTRUCTURE_BLOCKED = "infrastructure_blocked"

@@ -175,6 +175,17 @@ class SupervisedEvaluationSetupTests(unittest.TestCase):
         self.assertEqual(result["recall"], 1.0)
         self.assertEqual(result["precision"], 0.6)
 
+    def test_finding_level_review_score_records_empty_review(self) -> None:
+        result = score_finding_ledger({
+            "reported_finding_ids": [],
+            "gold_defect_ids": ["g1", "g2", "g3"],
+            "matches": {},
+        })
+        self.assertEqual(result["reported_findings"], 0)
+        self.assertEqual(result["credited_findings"], 0)
+        self.assertEqual(result["recall"], 0.0)
+        self.assertIsNone(result["precision"])
+
     def test_campaign_state_requires_nine_candidates_and_preserves_terminal_cells(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp) / "campaign"
