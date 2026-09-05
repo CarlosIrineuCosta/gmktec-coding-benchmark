@@ -1,0 +1,34 @@
+{
+  "evaluation_id": "qwen38-gallery-supervised-comparison-20260902",
+  "run_date": "2026-09-02",
+  "scope": "qualitative supervised local-gallery comparison",
+  "results": [
+    {
+      "candidate": "GLM 5.3",
+      "result": "owner-confirmed working gallery",
+      "visual_assessment": "ran well",
+      "controller_elapsed": null,
+      "elapsed_note": "The disposable source and controller evidence were not retained.",
+      "evidence_class": "Owner qualitative confirmation"
+    },
+    {
+      "candidate": "Qwen3.8-27B-UD-Q6_K_XL",
+      "result": "perfect result for this task; accepted",
+      "visual_assessment": "visually good; Owner assessed it at the same level as GLM 5.3",
+      "controller_elapsed": "02:15:21.929",
+      "browser_acceptance": "passed",
+      "build": "passed",
+      "e2e_note": "The fixture had no discoverable tests; no application assertion failed."
+    },
+    {
+      "candidate": "Qwen3.8-Flash-Next-UD-Q3_K_XL",
+      "result": "perfect result for this task; accepted",
+      "visual_assessment": "visually good; Owner ranked it as more polished",
+      "controller_elapsed": "01:53:46.803",
+      "browser_acceptance": "passed",
+      "build": "passed",
+      "e2e_note": "The candidate omitted final E2E invocation after its successful build."
+    }
+  ],
+  "elapsed_definition": "From valid durable controller creation to accepted terminal classification. Includes model turns, bounded tool use, supervision, and validation."
+}

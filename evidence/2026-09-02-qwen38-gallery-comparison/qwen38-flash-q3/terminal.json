@@ -1,0 +1,13 @@
+{
+  "candidate": "Qwen3.8-Flash-Next-UD-Q3_K_XL",
+  "run_id": "gallery-flash-true-unlimited",
+  "finished_at_utc": "2026-09-02T06:00:36.256922+00:00",
+  "terminal_class": "accepted",
+  "context_tokens": 131072,
+  "reasoning": "on/xhigh/preserve",
+  "completion_budget": "unlimited; no max_tokens request field",
+  "transport_timeout": "unlimited",
+  "build": "passed",
+  "e2e": "not invoked by candidate after final successful build",
+  "browser_validation": "passed"
+}

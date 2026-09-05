@@ -1,0 +1,21 @@
+{
+  "name": "evaluation-gallery-starter",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "validate:manifest": "node scripts/gen-manifest.mjs",
+    "prebuild": "node scripts/gen-manifest.mjs",
+    "build": "vite build",
+    "predev": "node scripts/gen-manifest.mjs",
+    "dev": "vite --host 127.0.0.1",
+    "preview": "vite preview --host 127.0.0.1 --port 4173",
+    "serve": "node scripts/serve-dist.mjs",
+    "test:e2e": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.55.0",
+    "typescript": "5.9.2",
+    "vite": "7.1.7"
+  }
+}

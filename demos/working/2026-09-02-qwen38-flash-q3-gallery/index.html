@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <meta
+      name="description"
+      content="A local-only gallery of 24 public-domain works from The Metropolitan Museum of Art Open Access collection and other public-domain archives."
+    />
+    <title>Public Domain Gallery · 24 open-access works</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231c1a17'/%3E%3Cpath d='M7 22l5-7 4 5 3-4 6 6H7z' fill='%23e8c07d'/%3E%3Ccircle cx='12' cy='11' r='2.4' fill='%23e8c07d'/%3E%3C/svg%3E"
+    />
+  </head>
+  <body>
+    <a class="skip-link" href="#gallery-heading">Skip to the gallery grid</a>
+
+    <header class="site-header">
+      <p class="site-header__eyebrow">Open access · local-only build</p>
+      <h1 class="site-header__title">The Public Domain Gallery</h1>
+      <p class="site-header__lede">
+        <strong data-testid="total-count">24</strong> digitised works, served from this folder. Twelve supplied
+        masters join twelve additions acquired from The Metropolitan Museum of Art Open Access collection; every
+        reproduction is verified public domain before it is saved locally.
+      </p>
+      <ul class="site-header__facts" aria-label="Collection summary">
+        <li><span class="fact__value" data-testid="fact-work-count">24</span><span class="fact__label">works</span></li>
+        <li><span class="fact__value">2</span><span class="fact__label">contributing institutions</span></li>
+        <li><span class="fact__value">0</span><span class="fact__label">remote requests at runtime</span></li>
+      </ul>
+    </header>
+
+    <main>
+      <section class="controls" aria-labelledby="controls-heading">
+        <h2 id="controls-heading" class="visually-hidden">Browse the collection by category</h2>
+
+        <div class="controls__row">
+          <div
+            class="filters"
+            role="group"
+            aria-label="Filter works by category"
+            data-testid="filter-bar"
+          ></div>
+          <p class="status" role="status" aria-live="polite" data-testid="status">
+            Showing <strong data-testid="item-count">24</strong> of <span data-testid="total-count">24</span>
+            works · active filter: <strong data-testid="active-filter">All categories</strong>
+          </p>
+        </div>
+      </section>
+
+      <section class="collection" aria-labelledby="gallery-heading">
+        <h2 id="gallery-heading" class="visually-hidden">Gallery</h2>
+        <p class="hint">
+          Select a work to open the image viewer. Inside the viewer use the left and right arrow keys to move
+          through the current filter, Escape to close, and focus returns to the work you chose.
+        </p>
+        <ul class="grid" data-testid="gallery" data-active-category="All"></ul>
+        <p class="empty" data-testid="empty-state" hidden>No works match this filter yet.</p>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>
+        Rights statements for every record — including source page, rights page, download URL, checksum and pixel
+        dimensions — live in <code>public/images.json</code>. The gallery itself makes no network requests.
+      </p>
+    </footer>
+
+    <div
+      class="lightbox"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="lightbox-title"
+      aria-describedby="lightbox-attribution"
+      hidden
+      data-testid="lightbox"
+      data-position="0"
+      data-total="0"
+    >
+      <div class="lightbox__backdrop" data-close data-testid="lightbox-backdrop"></div>
+      <div class="lightbox__panel" data-lightbox-panel tabindex="-1">
+        <div class="lightbox__bar">
+          <p class="lightbox__counter" aria-live="polite" data-testid="lightbox-counter">0 of 0</p>
+          <button class="icon-button" type="button" data-close data-testid="lightbox-close">
+            <span class="icon-button__glyph" aria-hidden="true">✕</span>
+            <span>Close</span>
+            <kbd>Esc</kbd>
+          </button>
+        </div>
+
+        <div class="lightbox__stage">
+          <button class="nav-button nav-button--prev" type="button" data-nav="-1" data-testid="lightbox-prev"
+                  aria-label="Previous work (left arrow key)">
+            <span aria-hidden="true">‹</span>
+          </button>
+          <img class="lightbox__image" data-testid="lightbox-image" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="" />
+          <button class="nav-button nav-button--next" type="button" data-nav="1" data-testid="lightbox-next"
+                  aria-label="Next work (right arrow key)">
+            <span aria-hidden="true">›</span>
+          </button>
+        </div>
+
+        <div class="lightbox__caption">
+          <h2 class="lightbox__title" id="lightbox-title" data-testid="lightbox-title"></h2>
+          <p class="lightbox__attribution" data-testid="lightbox-attribution"></p>
+          <p class="lightbox__source">
+            <span data-testid="lightbox-institution"></span>
+            <span class="card__dot" aria-hidden="true">·</span>
+            <span data-testid="lightbox-rights"></span>
+            <span class="card__dot" aria-hidden="true">·</span>
+            <a
+              data-testid="lightbox-source-link"
+              href="#"
+              target="_blank"
+              rel="noreferrer noopener"
+              >Source record</a
+            >
+            <a
+              class="lightbox__optional"
+              data-testid="lightbox-download-link"
+              href="#"
+              target="_blank"
+              rel="noreferrer noopener"
+              hidden
+              >Original file</a
+            >
+          </p>
+          <p class="lightbox__file">
+            <span data-testid="lightbox-dimensions"></span>
+            <br />
+            <span class="lightbox__checksum" data-testid="lightbox-checksum"></span>
+          </p>
+          <p class="lightbox__keys">
+            <kbd>←</kbd><kbd>→</kbd> browse · <kbd>Esc</kbd> close
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

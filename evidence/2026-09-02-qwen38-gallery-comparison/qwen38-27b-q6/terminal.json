@@ -1,0 +1,13 @@
+{
+  "candidate": "Qwen3.8-27B-UD-Q6_K_XL",
+  "run_id": "gallery-true-unlimited",
+  "finished_at_utc": "2026-09-02T04:03:43.130746+00:00",
+  "terminal_class": "accepted",
+  "context_tokens": 131072,
+  "reasoning": "on/xhigh/preserve",
+  "completion_budget": "unlimited; no max_tokens request field",
+  "transport_timeout": "unlimited",
+  "build": "passed",
+  "e2e": "fixture contained no discoverable tests; no application assertion result",
+  "browser_validation": "passed"
+}
